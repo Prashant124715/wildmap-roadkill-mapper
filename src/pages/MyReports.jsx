@@ -1,0 +1,98 @@
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { MapPin, Calendar, Clock, AlertTriangle } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
+import Card from '../components/ui/Card';
+
+const MyReports = () => {
+  const { user } = useAuth();
+  const [reports, setReports] = useState([]);
+
+  useEffect(() => {
+    if (user) {
+      // Load reports from localStorage
+      const allReports = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
+      const userReports = allReports.filter(r => r.userId === user.id);
+      
+      // Sort by newest
+      userReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      setReports(userReports);
+    }
+  }, [user]);
+
+  if (!user) {
+    return <Navigate to="/contact" />;
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative min-h-screen">
+      
+      <div className="absolute top-1/4 right-0 w-96 h-96 bg-brand-lightGreen/10 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="mb-12 relative z-10">
+        <h2 className="text-4xl md:text-5xl font-hero font-bold mb-4 text-white uppercase">My Reports</h2>
+        <p className="text-gray-400 max-w-2xl text-sm leading-relaxed">
+          Track the status of the incidents you have reported. Your data is crucial for identifying emerging hotspots and deploying mitigation strategies.
+        </p>
+      </div>
+
+      <div className="relative z-10">
+        {reports.length === 0 ? (
+          <Card className="bg-brand-dark/80 backdrop-blur-xl border-white/10 text-center py-16">
+            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="text-gray-500" size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">No Reports Found</h3>
+            <p className="text-gray-400 text-sm">You haven't submitted any wildlife incident reports yet.</p>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {reports.map((report, index) => (
+              <motion.div
+                key={report.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="bg-brand-dark/80 backdrop-blur-xl border-white/10 h-full flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
+                      report.status === 'Pending' ? 'bg-orange-500/20 text-orange-500' :
+                      report.status === 'Verified' ? 'bg-green-500/20 text-green-500' :
+                      'bg-gray-500/20 text-gray-500'
+                    }`}>
+                      {report.status}
+                    </span>
+                    <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                      <Clock size={12} /> {new Date(report.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+
+                  <h4 className="text-brand-orange font-bold mb-2">{report.species || 'Unknown Species'}</h4>
+                  
+                  <div className="space-y-2 mb-4 flex-grow">
+                    <div className="flex items-start gap-2 text-xs text-gray-300">
+                      <MapPin size={14} className="shrink-0 mt-0.5 text-gray-500" />
+                      <span>{report.location}</span>
+                    </div>
+                    <div className="flex items-start gap-2 text-xs text-gray-300">
+                      <Calendar size={14} className="shrink-0 mt-0.5 text-gray-500" />
+                      <span>{report.date}</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/50 p-3 rounded border border-white/5 text-[11px] text-gray-400 italic line-clamp-3">
+                    "{report.details}"
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default MyReports;
