@@ -90,37 +90,39 @@ const Contact = () => {
       savedReports.push({ id: reportId, ...reportData });
       localStorage.setItem('wildmap_reports', JSON.stringify(savedReports));
 
-      // 2. Attempt Firebase save in the background (fire and forget with timeout)
+      // 2. Sync to Firebase
       if (navigator.onLine) {
-        // We do not await this, so the UI can proceed immediately.
-        // It will sync to Firebase in the background.
-        (async () => {
-          try {
-            if (image?.file) {
-              const fileExtension = image.file.name.split('.').pop();
-              const fileName = `reports/${reportId}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
-              const storageRef = ref(storage, fileName);
-              
-              await uploadBytes(storageRef, image.file);
-              reportData.imageUrl = await getDownloadURL(storageRef);
-              
-              // Update local storage with image URL
-              const updatedReports = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
-              const reportIndex = updatedReports.findIndex(r => r.id === reportId);
-              if (reportIndex !== -1) {
-                updatedReports[reportIndex].imageUrl = reportData.imageUrl;
-                localStorage.setItem('wildmap_reports', JSON.stringify(updatedReports));
-              }
+        try {
+          let currentImageUrl = null;
+          if (image?.file) {
+            const fileExtension = image.file.name.split('.').pop();
+            const fileName = `reports/${reportId}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+            const storageRef = ref(storage, fileName);
+            
+            await uploadBytes(storageRef, image.file);
+            currentImageUrl = await getDownloadURL(storageRef);
+            
+            // Update local storage with image URL
+            const updatedReports = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
+            const reportIndex = updatedReports.findIndex(r => r.id === reportId);
+            if (reportIndex !== -1) {
+              updatedReports[reportIndex].imageUrl = currentImageUrl;
+              localStorage.setItem('wildmap_reports', JSON.stringify(updatedReports));
             }
-
-            await addDoc(collection(db, 'reports'), {
-              ...reportData,
-              timestamp: serverTimestamp(),
-            });
-          } catch (err) {
-            console.error("Background Firebase sync failed:", err);
           }
-        })();
+
+          await addDoc(collection(db, 'reports'), {
+            ...reportData,
+            id: reportId, // Ensure ID is consistent
+            imageUrl: currentImageUrl,
+            timestamp: serverTimestamp(),
+          });
+          console.log("Report synced to Firebase successfully");
+        } catch (err) {
+          console.error("Firebase sync failed:", err);
+          // We still have it in localStorage, but we should let the user know it's not in the cloud
+          throw new Error("Failed to sync report to cloud database.");
+        }
       }
 
       setSubmitSuccess(true);
@@ -134,7 +136,7 @@ const Contact = () => {
 
     } catch (error) {
       console.error("Error submitting report:", error);
-      alert("Failed to save report locally.");
+      alert("Error: " + error.message);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon, divIcon } from 'leaflet';
 import { Filter, Layers, AlertCircle, ChevronRight, MapPin } from 'lucide-react';
@@ -39,15 +39,56 @@ const createCustomIcon = (severity) => {
 };
 
 import { useNetwork } from '../hooks/useNetwork';
+import { db } from '../lib/firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
 const MapPage = () => {
   const isOnline = useNetwork();
   const [activeIncident, setActiveIncident] = useState(null);
   const [filter, setFilter] = useState('All');
+  const [realIncidents, setRealIncidents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRealIncidents = async () => {
+      try {
+        const q = query(collection(db, 'reports'), where('status', '==', 'Verified'));
+        const querySnapshot = await getDocs(q);
+        const fetched = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          // Map Firestore data to the format expected by the Map component
+          return {
+            id: doc.id,
+            species: data.species,
+            severity: data.aiScore >= 70 ? 'Critical' : data.aiScore >= 40 ? 'High' : 'Medium',
+            location: data.location.split(',').map(c => parseFloat(c.trim())),
+            description: data.details,
+            date: data.date,
+            time: 'N/A',
+            category: 'Citizen Report',
+            action: 'Report verified by wildlife authorities.'
+          };
+        });
+        setRealIncidents(fetched);
+      } catch (error) {
+        console.error("Error fetching incidents for map:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isOnline) {
+      fetchRealIncidents();
+    }
+  }, [isOnline]);
+
+  // Merge mock data with real data for better demonstration if needed, 
+  // or just use real data. Here we merge them.
+  const allIncidents = [...mockIncidents, ...realIncidents];
 
   const filteredIncidents = filter === 'All' 
-    ? mockIncidents 
-    : mockIncidents.filter(inc => inc.severity === filter);
+    ? allIncidents 
+    : allIncidents.filter(inc => inc.severity === filter);
 
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-80px)]">

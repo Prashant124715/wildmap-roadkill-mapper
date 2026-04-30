@@ -13,31 +13,35 @@ const AuthModal = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
     let result;
-    if (isLogin) {
-      result = login(formData.email, formData.password);
-    } else {
-      if (!formData.name) {
-        setError('Name is required');
-        return;
+    try {
+      if (isLogin) {
+        result = await login(formData.email, formData.password);
+      } else {
+        if (!formData.name) {
+          setError('Name is required');
+          return;
+        }
+        result = await signup(formData.name, formData.email, formData.password);
       }
-      result = signup(formData.name, formData.email, formData.password);
-    }
 
-    if (result.success) {
-      closeAuthModal();
-      setFormData({ name: '', email: '', password: '' });
-      
-      // Auto-redirect to admin panel if logging in as admin
-      if (formData.email === 'admin@wildmap.in') {
-        navigate('/admin');
+      if (result.success) {
+        closeAuthModal();
+        setFormData({ name: '', email: '', password: '' });
+        
+        // Auto-redirect to admin panel if logging in as admin
+        if (formData.email === 'admin@wildmap.in') {
+          navigate('/admin');
+        }
+      } else {
+        setError(result.error);
       }
-    } else {
-      setError(result.error);
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
     }
   };
 
@@ -88,7 +92,7 @@ const AuthModal = () => {
                 onClick={() => { 
                   setAuthType('admin'); 
                   setIsLogin(true); 
-                  setFormData({ name: '', email: 'admin@wildmap.in', password: 'admin123' });
+                  setFormData({ name: '', email: 'admin@wildmap.in', password: 'admin@123' });
                 }}
                 className={`text-xs font-bold uppercase tracking-widest transition-colors ${authType === 'admin' ? 'text-brand-orange' : 'text-gray-500 hover:text-white'}`}
               >

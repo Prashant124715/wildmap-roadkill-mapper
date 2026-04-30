@@ -20,12 +20,27 @@ const icons = {
   Rejected: createIcon('red')
 };
 
+import { db } from '../../lib/firebase';
+import { collection, getDocs, query } from 'firebase/firestore';
+
 const AdminMap = () => {
   const [reports, setReports] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
-    setReports(saved);
+    const fetchAllReports = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'reports'));
+        const allReports = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setReports(allReports);
+      } catch (error) {
+        console.error("Error fetching reports for map:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAllReports();
   }, []);
 
   return (

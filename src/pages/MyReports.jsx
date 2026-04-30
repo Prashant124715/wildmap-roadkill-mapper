@@ -5,20 +5,41 @@ import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 
+import { db } from '../lib/firebase';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+
 const MyReports = () => {
   const { user } = useAuth();
   const [reports, setReports] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      // Load reports from localStorage
-      const allReports = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
-      const userReports = allReports.filter(r => r.userId === user.id);
+    const fetchUserReports = async () => {
+      if (!user) return;
       
-      // Sort by newest
-      userReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-      setReports(userReports);
-    }
+      setIsLoading(true);
+      try {
+        const q = query(
+          collection(db, 'reports'), 
+          where('userId', '==', user.id),
+          orderBy('timestamp', 'desc')
+        );
+        const querySnapshot = await getDocs(q);
+        const userReports = querySnapshot.docs.map(doc => ({ 
+          id: doc.id, 
+          ...doc.data(),
+          // Handle potential serverTimestamp issues during initial fetch
+          timestamp: doc.data().timestamp?.toDate?.()?.toISOString() || doc.data().timestamp
+        }));
+        setReports(userReports);
+      } catch (error) {
+        console.error("Error fetching user reports:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserReports();
   }, [user]);
 
   if (!user) {

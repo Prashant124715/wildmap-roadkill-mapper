@@ -3,26 +3,45 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Check, X, AlertTriangle, ShieldCheck, Cpu } from 'lucide-react';
 import ReportDetailsModal from '../../components/admin/ReportDetailsModal';
 
+import { db } from '../../lib/firebase';
+import { collection, onSnapshot, query, orderBy, doc, updateDoc } from 'firebase/firestore';
+
 const ReportManagement = () => {
   const [reports, setReports] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState(null);
 
-  const loadReports = () => {
-    const saved = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
-    // Sort newest first
-    saved.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    setReports(saved);
-  };
-
   useEffect(() => {
-    loadReports();
+    setIsLoading(true);
+    const q = query(collection(db, 'reports'), orderBy('timestamp', 'desc'));
+    
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const fetchedReports = querySnapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate?.()?.toISOString() || doc.data().timestamp
+      }));
+      setReports(fetchedReports);
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Error fetching reports:", error);
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const handleUpdateStatus = (id, newStatus) => {
-    const updated = reports.map(r => r.id === id ? { ...r, status: newStatus } : r);
-    setReports(updated);
-    localStorage.setItem('wildmap_reports', JSON.stringify(updated));
-    setSelectedReport(null); // close modal if open
+  const handleUpdateStatus = async (id, newStatus) => {
+    try {
+      const reportRef = doc(db, 'reports', id);
+      await updateDoc(reportRef, { status: newStatus });
+      // State updates automatically via onSnapshot
+      setSelectedReport(null);
+    } catch (error) {
+      console.error("Error updating report status:", error);
+      alert("Failed to update report status in database.");
+    }
   };
 
   return (
@@ -157,11 +176,20 @@ const ReportManagement = () => {
         isOpen={!!selectedReport} 
         onClose={() => setSelectedReport(null)}
         onUpdateStatus={handleUpdateStatus}
-        onUpdateReport={(updatedReport) => {
-          const updated = reports.map(r => r.id === updatedReport.id ? updatedReport : r);
-          setReports(updated);
-          localStorage.setItem('wildmap_reports', JSON.stringify(updated));
-          setSelectedReport(updatedReport);
+        onUpdateReport={async (updatedReport) => {
+          try {
+            const reportRef = doc(db, 'reports', updatedReport.id);
+            // Remove the id from the data being sent to Firestore
+            const { id, ...data } = updatedReport;
+            await updateDoc(reportRef, data);
+            
+            const updated = reports.map(r => r.id === updatedReport.id ? updatedReport : r);
+            setReports(updated);
+            setSelectedReport(updatedReport);
+          } catch (error) {
+            console.error("Error updating report:", error);
+            alert("Failed to save changes to database.");
+          }
         }}
       />
     </div>

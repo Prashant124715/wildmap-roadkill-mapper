@@ -2,43 +2,55 @@ import { useState, useEffect } from 'react';
 import { Flame, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+import { db } from '../../lib/firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+
 const HotspotAnalysis = () => {
   const [reports, setReports] = useState([]);
   const [hotspotData, setHotspotData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
-    // Only analyze verified reports
-    const verified = saved.filter(r => r.status === 'Verified');
-    setReports(verified);
+    const fetchVerifiedReports = async () => {
+      try {
+        const q = query(collection(db, 'reports'), where('status', '==', 'Verified'));
+        const querySnapshot = await getDocs(q);
+        const verified = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setReports(verified);
 
-    // Group by location (mock clustering)
-    const clusters = {};
-    verified.forEach(r => {
-      if (!r.location) return;
-      // In a real app, this would use geohashing or spatial clustering (DBSCAN)
-      // Here we mock it by roughly grouping coordinates or just using the string
-      const locKey = r.location.substring(0, 5); // very crude grouping
-      if (!clusters[locKey]) {
-        clusters[locKey] = {
-          id: locKey,
-          center: r.location,
-          count: 0,
-          species: new Set()
-        };
+        // Group by location (mock clustering)
+        const clusters = {};
+        verified.forEach(r => {
+          if (!r.location) return;
+          const locKey = r.location.substring(0, 5); // crude grouping
+          if (!clusters[locKey]) {
+            clusters[locKey] = {
+              id: locKey,
+              center: r.location,
+              count: 0,
+              species: new Set()
+            };
+          }
+          clusters[locKey].count += 1;
+          clusters[locKey].species.add(r.species);
+        });
+
+        const formattedData = Object.values(clusters).map(c => ({
+          name: `Zone ${c.id}`,
+          incidents: c.count,
+          speciesCount: c.species.size,
+          riskLevel: c.count > 5 ? 'Critical' : c.count > 2 ? 'High' : 'Medium'
+        })).sort((a, b) => b.incidents - a.incidents);
+
+        setHotspotData(formattedData);
+      } catch (error) {
+        console.error("Error fetching hotspot data:", error);
+      } finally {
+        setIsLoading(false);
       }
-      clusters[locKey].count += 1;
-      clusters[locKey].species.add(r.species);
-    });
+    };
 
-    const formattedData = Object.values(clusters).map(c => ({
-      name: `Zone ${c.id}`,
-      incidents: c.count,
-      speciesCount: c.species.size,
-      riskLevel: c.count > 5 ? 'Critical' : c.count > 2 ? 'High' : 'Medium'
-    })).sort((a, b) => b.incidents - a.incidents);
-
-    setHotspotData(formattedData);
+    fetchVerifiedReports();
   }, []);
 
   return (

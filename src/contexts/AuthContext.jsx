@@ -1,4 +1,12 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { auth } from '../lib/firebase';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  updateProfile
+} from 'firebase/auth';
 
 const AuthContext = createContext();
 
@@ -6,60 +14,72 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Load user from localStorage on init
   useEffect(() => {
-    const storedUser = localStorage.getItem('wildmap_user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error("Failed to parse stored user", e);
+    // Listen for real-time auth changes
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // Special case for our hardcoded admin email if they want to keep it simple
+        const isAdmin = firebaseUser.email === 'admin@wildmap.in';
+        setUser({
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName || (isAdmin ? 'System Admin' : 'User'),
+          email: firebaseUser.email,
+          role: isAdmin ? 'admin' : 'user'
+        });
+      } else {
+        setUser(null);
       }
-    }
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const login = (email, password) => {
-    // Check for admin
-    if (email === 'admin@wildmap.in' && password === 'admin123') {
-      const adminUser = { id: 'admin-001', name: 'System Admin', email, role: 'admin' };
-      setUser(adminUser);
-      localStorage.setItem('wildmap_user', JSON.stringify(adminUser));
+  const login = async (email, password) => {
+    // 1. Check for hardcoded admin first (bypassing Firebase)
+    if (email === 'admin@wildmap.in' && password === 'admin@123') {
+      setUser({
+        id: 'admin-hardcoded-001',
+        name: 'System Admin',
+        email: 'admin@wildmap.in',
+        role: 'admin'
+      });
       return { success: true };
     }
 
-    const users = JSON.parse(localStorage.getItem('wildmap_users') || '[]');
-    const existingUser = users.find(u => u.email === email && u.password === password);
-    
-    if (existingUser) {
-      const userData = { id: existingUser.id, name: existingUser.name, email: existingUser.email, role: 'user' };
-      setUser(userData);
-      localStorage.setItem('wildmap_user', JSON.stringify(userData));
+    // 2. Otherwise, check Firebase Auth for regular users
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
+    } catch (error) {
+      console.error("Login failed:", error);
+      return { success: false, error: error.message };
     }
-    return { success: false, error: 'Invalid email or password' };
   };
 
-  const signup = (name, email, password) => {
-    const users = JSON.parse(localStorage.getItem('wildmap_users') || '[]');
-    if (users.find(u => u.email === email)) {
-      return { success: false, error: 'Email already exists' };
+  const signup = async (name, email, password) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Update profile with name
+      await updateProfile(userCredential.user, { displayName: name });
+      
+      // Local state will update via onAuthStateChanged
+      return { success: true };
+    } catch (error) {
+      console.error("Signup failed:", error);
+      return { success: false, error: error.message };
     }
-    
-    const newUser = { id: Date.now().toString(), name, email, password };
-    users.push(newUser);
-    localStorage.setItem('wildmap_users', JSON.stringify(users));
-    
-    const userData = { id: newUser.id, name, email };
-    setUser(userData);
-    localStorage.setItem('wildmap_user', JSON.stringify(userData));
-    return { success: true };
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('wildmap_user');
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const openAuthModal = () => setIsAuthModalOpen(true);
@@ -68,6 +88,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ 
       user, 
+      isLoading,
       login, 
       signup, 
       logout, 
@@ -75,7 +96,7 @@ export const AuthProvider = ({ children }) => {
       openAuthModal, 
       closeAuthModal 
     }}>
-      {children}
+      {!isLoading && children}
     </AuthContext.Provider>
   );
 };
