@@ -82,14 +82,36 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onUpdateStatus, onUpdateR
                       />
                     </div>
                   </div>
+                  <div className="flex justify-between items-center bg-white/5 border border-white/10 p-3 rounded-lg">
+                    <div>
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Authenticity</span>
+                      <span className={`text-xs font-bold uppercase tracking-wider ${
+                        report.confidence === 'High' ? 'text-brand-lightGreen' : 
+                        report.confidence === 'Medium' ? 'text-yellow-400' : 'text-red-400'
+                      }`}>
+                        {report.confidence || (report.aiScore >= 70 ? 'High' : report.aiScore >= 40 ? 'Medium' : 'Low')} Confidence
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">AI Score</span>
+                      <span className="text-sm font-mono font-bold text-white">{report.aiScore}%</span>
+                    </div>
+                  </div>
+
+                  {report.explanation && (
+                    <div className="bg-white/5 border border-white/10 p-3 rounded-lg">
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">AI Explanation</span>
+                      <p className="text-xs text-gray-300 italic">"{report.explanation}"</p>
+                    </div>
+                  )}
 
                   {report.isFlagged && (
                     <div className="bg-red-500/10 border border-red-500/20 p-3 rounded flex gap-3 text-red-400 text-xs">
                       <AlertTriangle size={16} className="shrink-0" />
-                      <p>AI flags this image as low confidence. Human verification strongly recommended before approval.</p>
+                      <p>AI flags this report as potentially suspicious or low confidence. Manual review required.</p>
                     </div>
                   )}
-
+                  
                   <div>
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest mb-2 block">Detected Labels:</span>
                     <div className="flex flex-wrap gap-2">

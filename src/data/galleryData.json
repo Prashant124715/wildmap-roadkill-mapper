@@ -1,7 +1,7 @@
 [
   {
     "id": "1",
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Leopard_africa.jpg/800px-Leopard_africa.jpg",
+    "image_url": "/images/gallery/nighttime_crossing.png",
     "title": "Nighttime Highway Crossing",
     "animal": "Indian Leopard",
     "location": "Sanjay Gandhi National Park, Maharashtra",
@@ -12,11 +12,11 @@
     "source_url": "https://wti.org.in",
     "category": "Wildlife on Roads",
     "coordinates": [19.0760, 72.8777],
-    "is_placeholder": true
+    "is_placeholder": false
   },
   {
     "id": "2",
-    "image_url": "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "image_url": "/images/gallery/elephant_corridor.png",
     "title": "Elephant Corridor Intersection",
     "animal": "Asian Elephant",
     "location": "Coimbatore, Tamil Nadu",
@@ -27,7 +27,7 @@
     "source_url": "https://conservationindia.org",
     "category": "High-Risk Zones",
     "coordinates": [11.1271, 76.5387],
-    "is_placeholder": true
+    "is_placeholder": false
   },
   {
     "id": "3",
@@ -46,7 +46,7 @@
   },
   {
     "id": "4",
-    "image_url": "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "image_url": "/images/gallery/tiger_crossing.png",
     "title": "Tiger Reserve Border Patrol",
     "animal": "Bengal Tiger",
     "location": "Bandipur National Park, Karnataka",
@@ -57,7 +57,7 @@
     "source_url": "https://aranyabhavan.kar.nic.in",
     "category": "Conservation & Prevention Efforts",
     "coordinates": [11.6603, 76.6291],
-    "is_placeholder": true
+    "is_placeholder": false
   },
   {
     "id": "5",
@@ -76,7 +76,7 @@
   },
   {
     "id": "6",
-    "image_url": "https://images.unsplash.com/photo-1511497584788-876760111969?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "image_url": "/images/gallery/underpass_success.png",
     "title": "Underpass Mitigation Success",
     "animal": "Multiple Species",
     "location": "NH-44, Pench, Maharashtra",
@@ -87,6 +87,6 @@
     "source_url": "https://nhai.gov.in",
     "category": "Conservation & Prevention Efforts",
     "coordinates": [21.6565, 79.3361],
-    "is_placeholder": true
+    "is_placeholder": false
   }
 ]

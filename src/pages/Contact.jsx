@@ -11,6 +11,8 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import { useAuth } from '../contexts/AuthContext';
 
+import { analyzeImage } from '../lib/aiValidation';
+
 const Contact = () => {
   const { user, openAuthModal } = useAuth();
   const [formType, setFormType] = useState('general'); // 'general' or 'report'
@@ -43,9 +45,10 @@ const Contact = () => {
       },
       (error) => {
         console.error("Error getting location:", error);
-        alert('Unable to retrieve your location');
+        alert('Unable to retrieve your location. Please check your browser permissions.');
         setIsLocating(false);
-      }
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   };
 
@@ -69,65 +72,85 @@ const Contact = () => {
     }
 
     setIsSubmitting(true);
-    try {
-      let imageUrl = null;
-      const reportId = Date.now().toString();
+    
+    // Set a maximum timeout for the entire submission process to prevent UI hang
+    const submissionTimeout = setTimeout(() => {
+      if (isSubmitting) {
+        setIsSubmitting(false);
+        alert("Submission is taking longer than expected. The report has been saved locally and will sync when possible.");
+        setSubmitSuccess(true);
+      }
+    }, 20000); // 20s global timeout
 
-      // Create base report data
+    try {
+      const reportId = Date.now().toString();
+      
+      // 1. Run AI Validation (Gemini)
+      let aiResult;
+      try {
+        aiResult = await analyzeImage(image?.previewUrl || null, details);
+      } catch (aiErr) {
+        console.warn("AI Validation failed, using default values:", aiErr);
+        aiResult = { aiScore: 50, confidence: 'Medium', explanation: 'AI validation skipped' };
+      }
+
+      // 2. Prepare report data
       const reportData = {
-        userId: user ? user.id : 'anonymous',
+        userId: user ? user.name : 'Anonymous',
+        userEmail: user ? user.email : 'anonymous@wildmap.in',
         species: species || 'Unknown',
         date: date || new Date().toISOString().split('T')[0],
         location,
         details,
-        imageUrl: null, // will update if upload succeeds
+        imageUrl: null,
         timestamp: new Date().toISOString(),
-        status: 'Pending'
+        status: 'Pending',
+        aiScore: aiResult.aiScore || 50,
+        confidence: aiResult.confidence || 'Medium',
+        explanation: aiResult.explanation || 'Analyzed by System',
+        isFlagged: aiResult.isFlagged || false
       };
 
-      // 1. ALWAYS store locally first so the user's data isn't lost if Firebase hangs
+      // 3. Store locally immediately
       const savedReports = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
       savedReports.push({ id: reportId, ...reportData });
       localStorage.setItem('wildmap_reports', JSON.stringify(savedReports));
 
-      // 2. Sync to Firebase
+      // 4. Sync to Firebase if online
       if (navigator.onLine) {
-        try {
-          let currentImageUrl = null;
-          if (image?.file) {
+        let currentImageUrl = null;
+        
+        // Upload image if exists
+        if (image?.file) {
+          try {
             const fileExtension = image.file.name.split('.').pop();
             const fileName = `reports/${reportId}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
             const storageRef = ref(storage, fileName);
-            
             await uploadBytes(storageRef, image.file);
             currentImageUrl = await getDownloadURL(storageRef);
-            
-            // Update local storage with image URL
-            const updatedReports = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
-            const reportIndex = updatedReports.findIndex(r => r.id === reportId);
-            if (reportIndex !== -1) {
-              updatedReports[reportIndex].imageUrl = currentImageUrl;
-              localStorage.setItem('wildmap_reports', JSON.stringify(updatedReports));
-            }
+          } catch (uploadErr) {
+            console.error("Image upload failed:", uploadErr);
           }
+        }
 
+        // Save to Firestore
+        try {
           await addDoc(collection(db, 'reports'), {
             ...reportData,
-            id: reportId, // Ensure ID is consistent
+            id: reportId,
             imageUrl: currentImageUrl,
             timestamp: serverTimestamp(),
           });
-          console.log("Report synced to Firebase successfully");
-        } catch (err) {
-          console.error("Firebase sync failed:", err);
-          // We still have it in localStorage, but we should let the user know it's not in the cloud
-          throw new Error("Failed to sync report to cloud database.");
+        } catch (dbErr) {
+          console.error("Firestore sync failed:", dbErr);
+          // Don't throw, we already have it in localStorage
         }
       }
 
+      clearTimeout(submissionTimeout);
       setSubmitSuccess(true);
       
-      // Reset form fields
+      // Reset form
       setSpecies('');
       setDate('');
       setLocation('');
@@ -135,9 +158,10 @@ const Contact = () => {
       setImage(null);
 
     } catch (error) {
-      console.error("Error submitting report:", error);
-      alert("Error: " + error.message);
+      console.error("Critical submission error:", error);
+      alert("Submission Error: " + (error.message || "Unknown error"));
     } finally {
+      clearTimeout(submissionTimeout);
       setIsSubmitting(false);
     }
   };

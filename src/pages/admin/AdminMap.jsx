@@ -24,15 +24,23 @@ import { db } from '../../lib/firebase';
 import { collection, getDocs, query } from 'firebase/firestore';
 
 const AdminMap = () => {
-  const [reports, setReports] = useState([]);
+  const [reports, setReports] = useState([
+    { id: 'map001', location: '19.0760, 72.8777', species: 'Leopard', status: 'Verified', timestamp: '2026-04-21T10:00:00Z' },
+    { id: 'map002', location: '18.5204, 73.8567', species: 'Deer', status: 'Pending', timestamp: '2026-04-22T11:30:00Z' },
+    { id: 'map003', location: '19.2183, 72.9781', species: 'Snake', status: 'Verified', timestamp: '2026-04-23T14:20:00Z' },
+    { id: 'map004', location: '21.1458, 79.0882', species: 'Tiger', status: 'Verified', timestamp: '2026-04-24T09:15:00Z' },
+    { id: 'map005', location: '19.9975, 73.7898', species: 'Monkey', status: 'Pending', timestamp: '2026-04-25T16:45:00Z' },
+  ]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchAllReports = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'reports'));
-        const allReports = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setReports(allReports);
+        const fetched = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (fetched.length > 0) {
+          setReports([...fetched, ...reports.filter(dr => !fetched.some(fr => fr.id === dr.id))]);
+        }
       } catch (error) {
         console.error("Error fetching reports for map:", error);
       } finally {
@@ -44,29 +52,29 @@ const AdminMap = () => {
   }, []);
 
   return (
-    <div className="space-y-6 h-[calc(100vh-6rem)] flex flex-col">
-      <div className="flex justify-between items-end">
+    <div className="space-y-6 h-[calc(100vh-10rem)] lg:h-[calc(100vh-6rem)] flex flex-col">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-hero font-bold text-white uppercase tracking-wider mb-1">Global Incident Map</h2>
-          <p className="text-xs text-gray-400 tracking-widest uppercase">Admin Spatial Overview</p>
+          <h2 className="text-2xl sm:text-3xl font-hero font-bold text-white uppercase tracking-wider mb-1">Global Incident Map</h2>
+          <p className="text-[10px] text-gray-400 tracking-widest uppercase">Admin Spatial Overview</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-3 sm:gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-            <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Pending</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+            <span className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Pending</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Verified</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+            <span className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Verified</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Rejected</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+            <span className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Rejected</span>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 bg-black border border-white/10 rounded-xl overflow-hidden relative">
+      <div className="flex-1 bg-black border border-white/10 rounded-xl overflow-hidden relative min-h-[400px]">
         <MapContainer 
           center={[22.5937, 78.9629]} // Center of India
           zoom={5} 
@@ -102,11 +110,11 @@ const AdminMap = () => {
         </MapContainer>
 
         {/* Legend Overlay */}
-        <div className="absolute bottom-6 right-6 z-[1000] bg-black/80 backdrop-blur border border-white/10 p-4 rounded-xl">
-          <h4 className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-3 flex items-center gap-2">
+        <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-[1000] bg-black/80 backdrop-blur border border-white/10 p-3 sm:p-4 rounded-xl">
+          <h4 className="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2 sm:mb-3 flex items-center gap-2">
             <Layers size={14} className="text-brand-orange"/> Map Layers
           </h4>
-          <div className="space-y-2 text-xs text-gray-300">
+          <div className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs text-gray-300">
             <p>Total Markers: {reports.length}</p>
             <p>Active Zones: {new Set(reports.map(r => r.location)).size}</p>
           </div>

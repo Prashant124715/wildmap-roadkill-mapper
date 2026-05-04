@@ -1,131 +1,102 @@
 /**
- * Live OpenAI Vision Validation Service for WILDMAP.
- * Uses OpenAI's gpt-4o model to analyze images of reported wildlife incidents.
+ * Google Gemini AI Validation Service for WILDMAP.
+ * Acts as a validation engine for citizen-reported wildlife incidents.
  */
 
 export const analyzeImage = async (imageUrl, description = '') => {
-  // If no image URL is provided, return default low score
-  if (!imageUrl) {
-    return {
-      aiScore: 0,
-      labels: ['no-image'],
-      isFlagged: true,
-      timestamp: new Date().toISOString()
-    };
-  }
+  const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
 
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  // Default fallback if API key is missing or fails
+  const errorResponse = {
+    aiScore: 50,
+    confidence: "Medium",
+    explanation: "AI analysis unavailable",
+    isFlagged: false,
+    timestamp: new Date().toISOString()
+  };
 
-  // Fallback to simulator if no API key is found
   if (!apiKey) {
-    console.warn("No OpenAI API key found in .env. Falling back to simulated analysis.");
-    return fallbackSimulator(imageUrl, description);
+    console.warn("No Google API key found in .env. Using default AI response.");
+    return errorResponse;
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    // Add a timeout to prevent hanging the submission
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
       },
+      signal: controller.signal,
       body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
+        contents: [
           {
-            role: "system",
-            content: `You are an AI assistant for a wildlife conservation app. Your task is to analyze an image of a reported wildlife incident (usually roadkill or animal crossing). 
-You must output ONLY raw JSON data with no markdown blocks or formatting. The JSON must contain:
-1. "aiScore": an integer from 0 to 100 representing the confidence that the image shows an animal and/or a road/vehicle context. (e.g. animal + road = high score, only animal = medium, neither = low).
-2. "labels": an array of short lowercase strings identifying key elements (e.g. ["animal", "road", "leopard", "blood"]).`
-          },
-          {
-            role: "user",
-            content: [
+            parts: [
               {
-                type: "text",
-                text: `Please analyze this incident image. The user described it as: "${description}".`
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: imageUrl
-                }
+                text: `Analyze this wildlife incident report for authenticity and roadkill presence.
+Context: This is a system for detecting and mapping wildlife roadkill incidents.
+User Description: "${description}"
+
+Based on the description and the context of wildlife roadkill detection, evaluate if this report is likely real, suspicious, or fake.
+
+Return your analysis in exactly this JSON format:
+{
+  "score": [number 0-100],
+  "confidence": ["High" | "Medium" | "Low"],
+  "explanation": "[1-2 line short explanation]"
+}
+
+Scoring Logic:
+- 70-100: High confidence (likely real)
+- 40-69: Medium confidence (needs review)
+- 0-39: Low confidence (likely fake)
+
+Only return the raw JSON.`
               }
             ]
           }
-        ],
-        max_tokens: 300
+        ]
       })
     });
 
+    clearTimeout(timeoutId);
     const data = await response.json();
 
-    if (data.error) {
-      console.error("OpenAI API Error:", data.error);
-      return fallbackSimulator(imageUrl, description);
+    if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+      console.error("Gemini API error or empty response:", data);
+      return errorResponse;
     }
 
-    // Parse the JSON response
-    const content = data.choices[0].message.content.trim();
-    // In case the model accidentally includes markdown blocks (```json ... ```)
-    const cleanJsonString = content.replace(/```json/g, '').replace(/```/g, '').trim();
+    const textResponse = data.candidates[0].content.parts[0].text;
     
-    const parsedData = JSON.parse(cleanJsonString);
-    const score = parsedData.aiScore !== undefined ? parsedData.aiScore : 0;
-    
-    return {
-      aiScore: score,
-      labels: parsedData.labels || ['unrecognized'],
-      isFlagged: score < 40,
-      timestamp: new Date().toISOString()
-    };
+    // Parse the JSON from the text response
+    try {
+      const cleanJson = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+      const result = JSON.parse(cleanJson);
+      
+      const score = result.score !== undefined ? Number(result.score) : 50;
+      
+      return {
+        aiScore: score,
+        confidence: result.confidence || (score >= 70 ? "High" : score >= 40 ? "Medium" : "Low"),
+        explanation: result.explanation || "Analyzed by Gemini AI",
+        isFlagged: score < 40,
+        timestamp: new Date().toISOString()
+      };
+    } catch (parseError) {
+      console.error("Failed to parse Gemini response:", textResponse);
+      return errorResponse;
+    }
 
   } catch (error) {
-    console.error("Failed to connect to OpenAI:", error);
-    // Fallback to simulator if the API call fails
-    return fallbackSimulator(imageUrl, description);
+    if (error.name === 'AbortError') {
+      console.error("Gemini API request timed out");
+    } else {
+      console.error("Failed to connect to Gemini API:", error);
+    }
+    return errorResponse;
   }
-};
-
-/**
- * Fallback simulator used when API key is missing or network fails
- */
-const fallbackSimulator = async (imageUrl, description) => {
-  const delay = Math.floor(Math.random() * 1500) + 1500;
-  await new Promise(resolve => setTimeout(resolve, delay));
-
-  const descLower = description.toLowerCase();
-  const ANIMAL_KEYWORDS = ['leopard', 'elephant', 'tiger', 'deer', 'snake', 'macaque', 'bear', 'animal', 'bird', 'reptile'];
-  const ROAD_KEYWORDS = ['road', 'highway', 'tarmac', 'crossing', 'vehicle', 'car', 'truck'];
-
-  let hasAnimal = false;
-  let hasRoad = false;
-
-  ANIMAL_KEYWORDS.forEach(kw => { if (descLower.includes(kw)) hasAnimal = true; });
-  ROAD_KEYWORDS.forEach(kw => { if (descLower.includes(kw)) hasRoad = true; });
-
-  let baseScore = 0;
-  const labels = [];
-
-  if (hasAnimal && hasRoad) {
-    baseScore = 80 + Math.floor(Math.random() * 18);
-    labels.push('animal', 'road/vehicle', 'high-risk context');
-  } else if (hasAnimal) {
-    baseScore = 50 + Math.floor(Math.random() * 25);
-    labels.push('animal');
-  } else if (hasRoad) {
-    baseScore = 20 + Math.floor(Math.random() * 20);
-    labels.push('road');
-  } else {
-    baseScore = Math.floor(Math.random() * 35);
-    labels.push('unrecognized');
-  }
-
-  return {
-    aiScore: baseScore,
-    labels: labels,
-    isFlagged: baseScore < 40,
-    timestamp: new Date().toISOString()
-  };
 };

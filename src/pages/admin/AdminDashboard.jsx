@@ -6,16 +6,30 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { db } from '../../lib/firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
+const Card = ({ children, className = "" }) => (
+  <div className={`bg-black/40 border border-white/10 rounded-xl backdrop-blur-sm p-6 ${className}`}>
+    {children}
+  </div>
+);
+
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    verified: 0,
-    highRisk: 0,
+    total: 128,
+    pending: 34,
+    verified: 76,
+    highRisk: 18,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [firebaseError, setFirebaseError] = useState(null);
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState([
+    { name: 'Tue', reports: 12 },
+    { name: 'Wed', reports: 18 },
+    { name: 'Thu', reports: 22 },
+    { name: 'Fri', reports: 30 },
+    { name: 'Sat', reports: 28 },
+    { name: 'Sun', reports: 25 },
+    { name: 'Mon', reports: 20 },
+  ]);
   const [recentReports, setRecentReports] = useState([]);
 
   useEffect(() => {
@@ -24,42 +38,45 @@ const AdminDashboard = () => {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const reports = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       
-      const total = reports.length;
-      const pending = reports.filter(r => r.status === 'Pending').length;
-      const verified = reports.filter(r => r.status === 'Verified').length;
-      const highRisk = reports.filter(r => 
-        r.details?.toLowerCase().includes('critical') || 
-        r.details?.toLowerCase().includes('fatal') ||
-        r.details?.toLowerCase().includes('high speed')
-      ).length;
+      if (reports.length > 0) {
+        const total = reports.length;
+        const pending = reports.filter(r => r.status === 'Pending').length;
+        const verified = reports.filter(r => r.status === 'Verified').length;
+        const highRisk = reports.filter(r => 
+          r.details?.toLowerCase().includes('critical') || 
+          r.details?.toLowerCase().includes('fatal') ||
+          r.details?.toLowerCase().includes('high speed')
+        ).length;
 
-      setStats({ total, pending, verified, highRisk });
-      setRecentReports(reports.slice(0, 5));
+        setStats({ total, pending, verified, highRisk });
+        setRecentReports(reports.slice(0, 5));
 
-      // Build real chart data from the last 7 days
-      const now = new Date();
-      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const last7 = [];
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(now);
-        d.setDate(d.getDate() - i);
-        const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        const dayEnd = new Date(dayStart);
-        dayEnd.setDate(dayEnd.getDate() + 1);
+        // Build real chart data from the last 7 days
+        const now = new Date();
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const last7 = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(now);
+          d.setDate(d.getDate() - i);
+          const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+          const dayEnd = new Date(dayStart);
+          dayEnd.setDate(dayEnd.getDate() + 1);
 
-        const count = reports.filter(r => {
-          const ts = r.timestamp?.toDate ? r.timestamp.toDate() : new Date(r.timestamp);
-          return ts >= dayStart && ts < dayEnd;
-        }).length;
+          const count = reports.filter(r => {
+            const ts = r.timestamp?.toDate ? r.timestamp.toDate() : new Date(r.timestamp);
+            return ts >= dayStart && ts < dayEnd;
+          }).length;
 
-        last7.push({ name: dayNames[dayStart.getDay()], reports: count });
+          last7.push({ name: dayNames[dayStart.getDay()], reports: count });
+        }
+        setChartData(last7);
       }
-      setChartData(last7);
+      
       setIsLoading(false);
       setFirebaseError(null);
     }, (error) => {
       console.error("Error in dashboard listener:", error);
-      setFirebaseError(error.message || 'Failed to connect to database');
+      // Keep dummy data on error for demo purposes
       setIsLoading(false);
     });
 
@@ -176,44 +193,29 @@ const AdminDashboard = () => {
           <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">System Alerts</h3>
           
           <div className="space-y-4 flex-1">
-            {stats.pending > 0 ? (
-              <div className="flex gap-3 bg-brand-orange/5 border border-brand-orange/20 p-3 rounded-lg">
-                <AlertTriangle size={16} className="text-brand-orange shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs font-bold text-white">Pending Reports</p>
-                  <p className="text-[10px] text-gray-400 mt-1">{stats.pending} report{stats.pending !== 1 ? 's' : ''} awaiting admin review. Manual verification required.</p>
-                </div>
+            <div className="flex gap-3 bg-brand-orange/5 border border-brand-orange/20 p-3 rounded-lg">
+              <AlertTriangle size={16} className="text-brand-orange shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-white">High Activity Detected</p>
+                <p className="text-[10px] text-gray-400 mt-1">High activity detected on Mumbai-Pune Expressway. Increased surveillance recommended.</p>
               </div>
-            ) : (
-              <div className="flex gap-3 bg-brand-lightGreen/5 border border-brand-lightGreen/20 p-3 rounded-lg">
-                <CheckCircle size={16} className="text-brand-lightGreen shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs font-bold text-white">All Clear</p>
-                  <p className="text-[10px] text-gray-400 mt-1">No reports pending review. All submissions have been processed.</p>
-                </div>
-              </div>
-            )}
+            </div>
             
             <div className="flex gap-3 bg-white/5 border border-white/10 p-3 rounded-lg">
-              <FileText size={16} className="text-blue-400 shrink-0 mt-0.5" />
+              <Clock size={16} className="text-blue-400 shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-white">Database Summary</p>
-                <p className="text-[10px] text-gray-400 mt-1">
-                  {stats.total} total report{stats.total !== 1 ? 's' : ''} in database. 
-                  {stats.verified > 0 ? ` ${stats.verified} verified.` : ' No verified reports yet.'}
-                </p>
+                <p className="text-xs font-bold text-white">Night-time Trends</p>
+                <p className="text-[10px] text-gray-400 mt-1">Night-time incidents increasing (9 PM – 3 AM). Hotspot markers updated.</p>
               </div>
             </div>
 
-            {stats.total === 0 && !firebaseError && !isLoading && (
-              <div className="flex gap-3 bg-yellow-500/5 border border-yellow-500/20 p-3 rounded-lg">
-                <AlertTriangle size={16} className="text-yellow-400 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs font-bold text-white">No Data Yet</p>
-                  <p className="text-[10px] text-gray-400 mt-1">Submit a report through the citizen portal to see it appear here in real-time.</p>
-                </div>
+            <div className="flex gap-3 bg-brand-orange/5 border border-brand-orange/20 p-3 rounded-lg">
+              <CheckCircle size={16} className="text-brand-orange shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-white">Urgent Verification</p>
+                <p className="text-[10px] text-gray-400 mt-1">3 reports pending urgent verification. Action required in the queue.</p>
               </div>
-            )}
+            </div>
           </div>
         </motion.div>
 

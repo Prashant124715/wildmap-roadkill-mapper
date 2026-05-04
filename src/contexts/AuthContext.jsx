@@ -77,8 +77,10 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await signOut(auth);
+      setUser(null); // Explicitly clear local state (crucial for hardcoded admin bypass)
     } catch (error) {
       console.error("Logout failed:", error);
+      setUser(null); // Clear state even on error to ensure user can exit
     }
   };
 

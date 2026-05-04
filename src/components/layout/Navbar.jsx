@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { MapIcon, User, LogOut } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, LogOut, Menu, X } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '../../contexts/AuthContext';
+import logo from '../../assets/images/logo.png';
 
 const Navbar = () => {
   const location = useLocation();
   const { user, openAuthModal, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const links = [
     { name: 'HOME', path: '/' },
@@ -17,21 +20,26 @@ const Navbar = () => {
     { name: 'CONTACT', path: '/contact' }
   ];
 
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
   return (
     <nav className="sticky top-0 z-50 w-full glass-panel border-b border-white/10 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           
-          <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 rounded-full bg-brand-orange flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform">
-              <MapIcon size={20} />
-            </div>
-            <div>
-              <h1 className="text-xl font-hero font-bold tracking-widest text-white leading-none">WILDMAP</h1>
-              <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase">Roadkill Hotspot Mapper</span>
+          <Link to="/" className="flex items-center space-x-3 group shrink-0">
+            <img 
+              src={logo} 
+              alt="WILDMAP Logo" 
+              className="h-8 sm:h-10 w-auto object-contain group-hover:scale-110 transition-transform duration-300"
+            />
+            <div className="block">
+              <h1 className="text-lg sm:text-xl font-hero font-bold tracking-widest text-white leading-none">WILDMAP</h1>
+              <span className="text-[8px] sm:text-[10px] text-gray-400 tracking-[0.2em] uppercase">Roadkill Hotspot Mapper</span>
             </div>
           </Link>
 
+          {/* Desktop Navigation */}
           <div className="hidden lg:flex space-x-6 items-center">
             {links.map((link) => {
               const isActive = location.pathname === link.path;
@@ -93,8 +101,75 @@ const Navbar = () => {
               )}
             </div>
           </div>
+
+          {/* Mobile Menu Toggle */}
+          <button 
+            onClick={toggleMobileMenu}
+            className="lg:hidden p-2 text-gray-400 hover:text-white transition-colors"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Navigation Dropdown */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="lg:hidden bg-brand-dark/95 backdrop-blur-xl border-t border-white/10 overflow-hidden"
+          >
+            <div className="px-4 py-6 space-y-4">
+              {links.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={clsx(
+                    "block px-4 py-3 text-sm font-bold tracking-[0.2em] transition-colors rounded-lg",
+                    location.pathname === link.path ? "bg-brand-orange/10 text-brand-orange" : "text-gray-400 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  {link.name}
+                </Link>
+              ))}
+              
+              <div className="pt-4 border-t border-white/10">
+                {user ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 px-4 py-2">
+                      <User size={18} className="text-brand-orange" />
+                      <span className="text-sm font-bold text-white uppercase tracking-widest">{user.name}</span>
+                    </div>
+                    <Link 
+                      to="/my-reports" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-4 py-3 text-sm text-gray-400 hover:text-white"
+                    >
+                      My Reports
+                    </Link>
+                    <button 
+                      onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                      className="w-full text-left px-4 py-3 text-sm text-red-400 flex items-center gap-2"
+                    >
+                      <LogOut size={16} /> Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { openAuthModal(); setIsMobileMenuOpen(false); }}
+                    className="w-full bg-brand-orange text-white text-sm font-bold uppercase tracking-widest py-4 rounded-lg"
+                  >
+                    Sign In
+                  </button>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
