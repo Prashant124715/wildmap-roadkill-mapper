@@ -43,7 +43,12 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onUpdateStatus, onUpdateR
           <div className="w-full md:w-1/2 flex flex-col border-r border-white/10">
             <div className="h-64 md:h-1/2 relative bg-black flex items-center justify-center">
               {report.imageUrl ? (
-                <img src={report.imageUrl} alt="Report evidence" className="w-full h-full object-contain" />
+                <img 
+                  src={report.imageUrl} 
+                  alt="Report evidence" 
+                  className="w-full h-full object-contain"
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80'; }} 
+                />
               ) : (
                 <div className="text-center text-gray-500">
                   <Camera size={48} className="mx-auto mb-2 opacity-50" />

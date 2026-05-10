@@ -22,7 +22,7 @@ const Resources = () => {
             <ShieldAlert size={14} className="text-brand-orange" />
             <span className="text-[10px] text-brand-orange uppercase tracking-[0.2em]">{t('resources.badge')}</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-hero font-bold mb-4 text-white uppercase">{t('resources.title')}</h2>
+          <h2 className="text-4xl md:text-5xl font-hero font-bold mb-4 text-white uppercase">CONSERVATION RESOURCES</h2>
           <p className="text-gray-400 max-w-2xl mx-auto text-sm leading-relaxed">
             {t('resources.subtitle')}
           </p>

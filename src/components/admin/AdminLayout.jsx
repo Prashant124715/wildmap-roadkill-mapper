@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, BarChart2, Map, LogOut, User, Menu, X } from 'lucide-react';
+import { LayoutDashboard, FileText, BarChart2, Map, LogOut, User, Menu, X, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import logo from '../../assets/images/logo.png';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,6 +13,7 @@ const AdminLayout = () => {
   const menuItems = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
     { name: 'Reports', path: '/admin/reports', icon: FileText },
+    { name: 'Conflict Reports', path: '/admin/conflicts', icon: AlertTriangle },
     { name: 'Hotspots', path: '/admin/hotspots', icon: BarChart2 },
     { name: 'Global Map', path: '/admin/map', icon: Map },
   ];

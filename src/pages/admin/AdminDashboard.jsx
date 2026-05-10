@@ -95,15 +95,33 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h2 className="text-3xl font-hero font-bold text-white uppercase tracking-wider mb-1">{t('admin.overview')}</h2>
-          <div className="flex items-center gap-2">
+      {/* 1️⃣ ADMIN DASHBOARD HERO PANEL */}
+      <div className="relative w-full rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_40px_rgba(255,107,0,0.15)] mb-8">
+        {/* Uploaded Wildlife Conservation Image Background */}
+        <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-lighten" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1920')` }}></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-dark via-brand-dark/90 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark to-transparent opacity-80"></div>
+
+        <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="flex h-3 w-3 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-lightGreen opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-brand-lightGreen"></span>
+              </span>
+              <p className="text-brand-lightGreen text-xs font-bold uppercase tracking-[0.2em]">Real-Time Conservation Monitoring</p>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-cinematic font-bold text-white uppercase tracking-widest mb-4 leading-tight">AI Wildlife Intelligence Center</h1>
+            <p className="text-gray-300 text-sm md:text-base leading-relaxed border-l-2 border-brand-orange pl-4 max-w-2xl backdrop-blur-sm bg-black/10 p-2 rounded-r-lg">
+              Protecting biodiversity through predictive machine learning, community empowerment, and intelligent hotspot verification.
+            </p>
+          </div>
+          
+          <div className="hidden md:flex flex-col items-end gap-2 text-right">
             <p className="text-xs text-gray-400 tracking-widest uppercase">{t('admin.opsCenter')}</p>
-            <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-            <div className="flex items-center gap-1.5">
-              <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-500 animate-pulse' : firebaseError ? 'bg-red-500' : 'bg-brand-lightGreen'}`}></div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+            <div className="flex items-center gap-2 bg-black/50 border border-white/10 px-4 py-2 rounded-full backdrop-blur-md">
+              <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-500 animate-pulse' : firebaseError ? 'bg-red-500' : 'bg-brand-lightGreen shadow-[0_0_10px_rgba(34,197,94,0.8)]'}`}></div>
+              <p className="text-[10px] text-white uppercase tracking-widest font-bold">
                 {isLoading ? t('admin.dbConnecting') : firebaseError ? t('admin.dbError') : t('admin.dbOnline')}
               </p>
             </div>
@@ -119,15 +137,23 @@ const AdminDashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
-            className="bg-black/40 border border-white/10 rounded-xl p-6 backdrop-blur-sm"
+            className="relative bg-black/40 border border-white/10 rounded-xl p-6 backdrop-blur-sm overflow-hidden group hover:border-brand-orange/40 transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(255,107,0,0.15)]"
           >
-            <div className="flex justify-between items-start">
+            <div className={`absolute -right-6 -top-6 w-24 h-24 ${stat.bg} rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 opacity-50`}></div>
+            <div className="flex justify-between items-start relative z-10">
               <div>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">{stat.title}</p>
-                <h3 className="text-3xl font-bold text-white">{stat.value}</h3>
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">{stat.title}</p>
+                <motion.h3 
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 100, delay: idx * 0.1 + 0.2 }}
+                  className="text-4xl font-bold text-white tracking-tight drop-shadow-md"
+                >
+                  {stat.value}
+                </motion.h3>
               </div>
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${stat.bg} ${stat.color}`}>
-                <stat.icon size={20} />
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color} border border-white/5 shadow-inner`}>
+                <stat.icon size={22} className="group-hover:scale-110 transition-transform duration-300" />
               </div>
             </div>
           </motion.div>
@@ -167,35 +193,53 @@ const AdminDashboard = () => {
           </div>
         </motion.div>
 
-        {/* System Alerts */}
+        {/* 🧠 AI Conservation Insights Panel */}
         <motion.div 
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-          className="bg-black/40 border border-white/10 rounded-xl p-6 backdrop-blur-sm flex flex-col"
+          className="bg-black/40 border border-white/10 rounded-xl p-6 backdrop-blur-sm flex flex-col relative overflow-hidden group shadow-2xl"
         >
-          <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">{t('admin.alerts')}</h3>
+          {/* Subtle blurred background for ambient state */}
+          <div className="absolute inset-0 bg-cover bg-center opacity-10 blur-sm mix-blend-screen transition-opacity duration-500 group-hover:opacity-20 pointer-events-none" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=400')` }}></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/95 to-transparent pointer-events-none"></div>
           
-          <div className="space-y-4 flex-1">
-            <div className="flex gap-3 bg-brand-orange/5 border border-brand-orange/20 p-3 rounded-lg">
-              <AlertTriangle size={16} className="text-brand-orange shrink-0 mt-0.5" />
+          <div className="relative z-10 flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
+            <div className="w-8 h-8 rounded-full bg-brand-lightGreen/10 border border-brand-lightGreen/30 flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+              <CheckCircle size={14} className="text-brand-lightGreen" />
+            </div>
+            <h3 className="text-sm font-bold text-white uppercase tracking-widest">AI Conservation Insights</h3>
+          </div>
+          
+          <div className="space-y-4 flex-1 relative z-10">
+            <div className="flex gap-4 bg-black/40 hover:bg-white/5 border border-white/5 hover:border-white/20 p-4 rounded-xl transition-all cursor-default">
+              <div className="relative mt-1 shrink-0">
+                <span className="absolute inset-0 bg-brand-lightGreen rounded-full blur animate-pulse opacity-50"></span>
+                <div className="w-2 h-2 rounded-full bg-brand-lightGreen relative z-10"></div>
+              </div>
               <div>
-                <p className="text-xs font-bold text-white">{t('admin.highActivity')}</p>
-                <p className="text-[10px] text-gray-400 mt-1">{t('admin.highActivityDesc')}</p>
+                <p className="text-sm font-bold text-white tracking-wide">Elephant corridor activity increased by 18% this week.</p>
+                <p className="text-[10px] text-brand-lightGreen mt-1.5 font-bold tracking-widest uppercase">POSITIVE TREND</p>
               </div>
             </div>
             
-            <div className="flex gap-3 bg-white/5 border border-white/10 p-3 rounded-lg">
-              <Clock size={16} className="text-blue-400 shrink-0 mt-0.5" />
+            <div className="flex gap-4 bg-black/40 hover:bg-white/5 border border-white/5 hover:border-white/20 p-4 rounded-xl transition-all cursor-default">
+              <div className="relative mt-1 shrink-0">
+                <span className="absolute inset-0 bg-brand-orange rounded-full blur animate-pulse opacity-50"></span>
+                <div className="w-2 h-2 rounded-full bg-brand-orange relative z-10"></div>
+              </div>
               <div>
-                <p className="text-xs font-bold text-white">{t('admin.nightTrends')}</p>
-                <p className="text-[10px] text-gray-400 mt-1">{t('admin.nightTrendsDesc')}</p>
+                <p className="text-sm font-bold text-white tracking-wide">Nighttime leopard movement detected near NH-52.</p>
+                <p className="text-[10px] text-brand-orange mt-1.5 font-bold tracking-widest uppercase">ACTION RECOMMENDED</p>
               </div>
             </div>
 
-            <div className="flex gap-3 bg-brand-orange/5 border border-brand-orange/20 p-3 rounded-lg">
-              <CheckCircle size={16} className="text-brand-orange shrink-0 mt-0.5" />
+            <div className="flex gap-4 bg-black/40 hover:bg-white/5 border border-red-500/10 hover:border-red-500/30 p-4 rounded-xl transition-all cursor-default">
+              <div className="relative mt-1 shrink-0">
+                <span className="absolute inset-0 bg-red-400 rounded-full blur animate-pulse opacity-75"></span>
+                <div className="w-2 h-2 rounded-full bg-red-400 relative z-10"></div>
+              </div>
               <div>
-                <p className="text-xs font-bold text-white">{t('admin.urgentVerification')}</p>
-                <p className="text-[10px] text-gray-400 mt-1">{t('admin.urgentVerificationDesc')}</p>
+                <p className="text-sm font-bold text-white tracking-wide">Monsoon migration risk elevated significantly.</p>
+                <p className="text-[10px] text-red-400 mt-1.5 font-bold tracking-widest uppercase shadow-red-400">HIGH ALERT</p>
               </div>
             </div>
           </div>

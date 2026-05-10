@@ -4,11 +4,20 @@ import Footer from './components/layout/Footer';
 import Home from './pages/Home';
 import MapPage from './pages/MapPage';
 import Gallery from './pages/Gallery';
-import Contact from './pages/Contact';
 import StateAnalysis from './pages/StateAnalysis';
 import Resources from './pages/Resources';
 import MyReports from './pages/MyReports';
 import BiodiversityInsights from './pages/BiodiversityInsights';
+import DriverSafety from './pages/DriverSafety';
+import SeasonalTrends from './pages/SeasonalTrends';
+
+// Report Pages
+import ReportIncident from './pages/reports/ReportIncident';
+import ConflictSupport from './pages/reports/ConflictSupport';
+import ContactUs from './pages/reports/ContactUs';
+
+import About from './pages/About';
+
 import { AuthProvider } from './contexts/AuthContext';
 import AuthModal from './components/auth/AuthModal';
 import FloatingLanguageSelector from './components/ui/FloatingLanguageSelector';
@@ -22,6 +31,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ReportManagement from './pages/admin/ReportManagement';
 import AdminMap from './pages/admin/AdminMap';
 import HotspotAnalysis from './pages/admin/HotspotAnalysis';
+import ConflictManagement from './pages/admin/ConflictManagement';
 
 const AppContent = () => {
   const isOnline = useNetwork();
@@ -48,9 +58,17 @@ const AppContent = () => {
           <Route path="/map" element={<MapPage />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/resources" element={<Resources />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/seasonal-trends" element={<SeasonalTrends />} />
           <Route path="/my-reports" element={<MyReports />} />
           <Route path="/biodiversity" element={<BiodiversityInsights />} />
+          <Route path="/driver-safety" element={<DriverSafety />} />
+          
+          {/* Protected Report Routes */}
+          <Route path="/reports/incident" element={<ReportIncident />} />
+          <Route path="/reports/conflict-support" element={<ConflictSupport />} />
+          <Route path="/reports/contact" element={<ContactUs />} />
+
+          <Route path="/about" element={<About />} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={
@@ -60,6 +78,7 @@ const AppContent = () => {
           }>
             <Route index element={<AdminDashboard />} />
             <Route path="reports" element={<ReportManagement />} />
+            <Route path="conflicts" element={<ConflictManagement />} />
             <Route path="map" element={<AdminMap />} />
             <Route path="hotspots" element={<HotspotAnalysis />} />
           </Route>

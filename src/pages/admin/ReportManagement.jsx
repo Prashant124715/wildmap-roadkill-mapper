@@ -33,15 +33,15 @@ const ReportManagement = () => {
     
     // Set up real-time listener
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const fetchedReports = querySnapshot.docs.map(doc => ({ 
-        id: doc.id, 
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate?.()?.toISOString() || doc.data().timestamp
-      }));
+      const fetchedReports = querySnapshot.docs
+        .map(doc => ({ 
+          id: doc.id, 
+          ...doc.data(),
+          timestamp: doc.data().timestamp?.toDate?.()?.toISOString() || doc.data().timestamp
+        }))
+        .filter(report => report.type === 'Incident' || !report.type);
       
-      if (fetchedReports.length > 0) {
-        setReports([...fetchedReports, ...reports.filter(dr => !fetchedReports.some(fr => fr.id === dr.id))]);
-      }
+      setReports(fetchedReports);
       setIsLoading(false);
     }, (error) => {
       console.error("Error fetching reports:", error);

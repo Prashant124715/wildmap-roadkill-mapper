@@ -27,9 +27,14 @@ const AnimalCard = ({ animal, index }) => {
       className="group glass-panel rounded-2xl overflow-hidden border border-white/10 hover:border-brand-lightGreen/40 transition-all duration-500 hover:shadow-[0_8px_40px_rgba(59,139,84,0.15)]">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
         {/* Image */}
-        <div className="lg:col-span-4 relative overflow-hidden h-56 lg:h-auto">
-          <img src={animal.image} alt={animal.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="lg:col-span-4 relative overflow-hidden h-56 lg:h-auto bg-brand-dark">
+          <img 
+            src={animal.image} 
+            alt={animal.name} 
+            onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80'; }}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
           <div className="absolute bottom-4 left-4 right-4">
             <h3 className="text-2xl font-hero font-bold text-white">{animal.name}</h3>
             <p className="text-xs text-gray-300 italic">{animal.scientificName}</p>

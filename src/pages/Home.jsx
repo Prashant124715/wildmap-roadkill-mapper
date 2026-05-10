@@ -158,7 +158,7 @@ const Home = () => {
                 <div className="absolute inset-0 bg-white/15 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
               </motion.button>
             </Link>
-            <Link to="/contact">
+            <Link to="/reports/incident">
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
