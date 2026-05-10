@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon, divIcon } from 'leaflet';
-import { Filter, Layers, AlertCircle, ChevronRight, MapPin } from 'lucide-react';
+import { Filter, Layers, AlertCircle, ChevronRight, MapPin, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { mockIncidents } from '../data/mockData';
 import Card from '../components/ui/Card';
@@ -50,6 +50,14 @@ const MapPage = () => {
   const [filter, setFilter] = useState('All');
   const [realIncidents, setRealIncidents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    // Auto-close sidebar on small screens
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchRealIncidents = async () => {
@@ -93,15 +101,33 @@ const MapPage = () => {
     : allIncidents.filter(inc => inc.severity === filter);
 
   return (
-    <div className="flex flex-col md:flex-row h-[calc(100vh-80px)]">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] overflow-hidden relative">
       
       {/* Sidebar Controls */}
-      <div className="w-full md:w-80 glass-panel border-r border-white/10 flex flex-col z-20">
-        <div className="p-6 border-b border-white/10">
-          <h2 className="text-xl font-hero font-bold tracking-widest text-white mb-4 flex items-center gap-2">
-            <Filter size={20} className="text-brand-orange" />
-            {t('map.filters')}
-          </h2>
+      <motion.div 
+        initial={false}
+        animate={{ 
+          x: isSidebarOpen ? 0 : -320,
+          width: isSidebarOpen ? (window.innerWidth < 768 ? '100%' : '320px') : '0px'
+        }}
+        className={clsx(
+          "fixed md:relative inset-y-0 left-0 z-40 bg-brand-dark md:bg-transparent glass-panel border-r border-white/10 flex flex-col transition-all duration-300",
+          !isSidebarOpen && "pointer-events-none opacity-0 md:opacity-100"
+        )}
+      >
+        <div className="p-6 pt-20 md:pt-6 border-b border-white/10 shrink-0">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-hero font-bold tracking-widest text-white flex items-center gap-2">
+              <Filter size={20} className="text-brand-orange" />
+              {t('map.filters')}
+            </h2>
+            <button 
+              onClick={() => setIsSidebarOpen(false)}
+              className="md:hidden p-2 text-gray-400 hover:text-white"
+            >
+              <X size={20} />
+            </button>
+          </div>
           
           <div className="space-y-4">
             <div>
@@ -109,7 +135,7 @@ const MapPage = () => {
               <select 
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="w-full bg-brand-dark/50 border border-white/20 rounded p-2 text-sm text-white outline-none focus:border-brand-orange transition-colors"
+                className="w-full bg-brand-dark/50 border border-white/20 rounded p-3 text-sm text-white outline-none focus:border-brand-orange transition-colors"
               >
                 <option value="All">{t('map.allIncidents')}</option>
                 <option value="Critical">{t('map.allIncidents') === 'All Incidents' ? 'Critical' : 'गंभीर (Critical)'}</option>
@@ -129,9 +155,9 @@ const MapPage = () => {
         </div>
 
         {/* Issue Details Panel */}
-        <div className="flex-grow p-6 overflow-y-auto">
+        <div className="flex-grow p-6 overflow-y-auto custom-scrollbar pointer-events-auto">
           {activeIncident ? (
-            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 pb-20 md:pb-0">
               <div>
                 <div className="inline-flex items-center space-x-2 border border-brand-orange/30 px-2 py-1 rounded-full mb-3 bg-brand-orange/5">
                   <span className="text-[10px] text-brand-orange uppercase tracking-[0.2em]">{activeIncident.severity} Severity</span>
@@ -167,7 +193,15 @@ const MapPage = () => {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
+
+      {/* Floating Toggle Button */}
+      <button 
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="fixed bottom-6 left-6 z-[45] md:hidden bg-brand-orange text-white p-4 rounded-full shadow-2xl shadow-brand-orange/40 active:scale-95 transition-all"
+      >
+        {isSidebarOpen ? <X size={24} /> : <Filter size={24} />}
+      </button>
 
       {/* Map Area */}
       <div className="flex-grow relative z-0">

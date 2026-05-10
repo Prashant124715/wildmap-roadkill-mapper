@@ -294,16 +294,16 @@ const DriverSafety = () => {
       <div className="max-w-6xl mx-auto space-y-16 pb-20 relative z-10">
         
         {/* Toggle Switch */}
-        <div className="flex justify-end sticky top-24 z-50">
+        <div className="flex justify-end sticky top-20 md:top-24 z-50">
           <button 
             onClick={toggleDayNight}
-            className="flex items-center gap-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full p-1 shadow-2xl transition-all"
+            className="flex items-center gap-1 sm:gap-2 bg-black/60 backdrop-blur-2xl border border-white/20 rounded-full p-1 shadow-2xl transition-all"
           >
-            <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all ${!isNightMode ? 'bg-yellow-400 text-gray-900 shadow-md' : 'text-gray-400'}`}>
-              <Sun size={14} /> Day
+            <div className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all ${!isNightMode ? 'bg-yellow-400 text-gray-900 shadow-md' : 'text-gray-400'}`}>
+              <Sun size={12} /> Day
             </div>
-            <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all ${isNightMode ? 'bg-brand-orange text-white shadow-md' : 'text-gray-400'}`}>
-              <Moon size={14} /> Night
+            <div className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all ${isNightMode ? 'bg-brand-orange text-white shadow-md' : 'text-gray-400'}`}>
+              <Moon size={12} /> Night
             </div>
           </button>
         </div>
@@ -311,7 +311,7 @@ const DriverSafety = () => {
         {/* ================================================== */}
         {/* 1️⃣ HERO SAFETY BANNER                               */}
         {/* ================================================== */}
-        <div className="text-center space-y-8 pt-4">
+        <div className="text-center space-y-6 sm:space-y-8 pt-2 sm:pt-4">
           <div className="relative inline-block">
             <motion.div
               animate={{ scale: [1, 1.8, 2.5], opacity: [0.6, 0.2, 0] }}
@@ -321,39 +321,39 @@ const DriverSafety = () => {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className={`relative inline-flex items-center justify-center p-6 bg-[#0a0f0c]/90 backdrop-blur-xl border rounded-full transition-colors duration-1000 shadow-2xl ${glowShadow} ${isNightMode ? 'border-brand-orange/40' : 'border-yellow-400/40'}`}
+              className={`relative inline-flex items-center justify-center p-4 sm:p-6 bg-[#0a0f0c]/90 backdrop-blur-xl border rounded-full transition-colors duration-1000 shadow-2xl ${glowShadow} ${isNightMode ? 'border-brand-orange/40' : 'border-yellow-400/40'}`}
             >
-              <Shield size={64} className={`${accentColor} transition-colors duration-1000`} />
+              <Shield size={40} className={`${accentColor} sm:w-16 sm:h-16 transition-colors duration-1000`} />
             </motion.div>
           </div>
           
           <div>
-            <h1 className="text-5xl md:text-7xl font-cinematic font-bold tracking-widest text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-              DRIVER <span className={`${accentColor} transition-colors duration-1000 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]`}>SAFETY</span>
+            <h1 className="text-[clamp(2rem,10vw,4.5rem)] font-cinematic font-bold tracking-widest text-white leading-tight">
+              DRIVER <span className={`${accentColor} transition-colors duration-1000`}>SAFETY</span>
             </h1>
           </div>
           
-          <p className="text-gray-300 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed font-medium bg-black/50 backdrop-blur-xl py-5 px-8 rounded-3xl border border-white/10 shadow-2xl">
+          <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg md:text-xl leading-relaxed font-medium bg-black/50 backdrop-blur-xl py-4 sm:py-6 px-6 sm:px-10 rounded-3xl border border-white/10 shadow-2xl">
             AI-powered wildlife collision prevention and smart highway risk intelligence.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-4">
             {!isActive ? (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={startMonitoring}
                 disabled={isStarting}
-                className={`flex items-center gap-3 px-8 py-4 rounded-full font-bold uppercase tracking-widest transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-xl text-white ${buttonBg}`}
+                className={`w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-full font-bold uppercase tracking-widest transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-xl text-white text-xs sm:text-sm ${buttonBg}`}
               >
                 {isStarting ? (
                   <>
-                    <div className="w-6 h-6 border-2 border-t-transparent border-white/50 rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-t-transparent border-white/50 rounded-full animate-spin" />
                     Locating...
                   </>
                 ) : (
                   <>
-                    <Play size={24} />
+                    <Play size={20} />
                     Start Safety Monitoring
                   </>
                 )}
@@ -363,9 +363,9 @@ const DriverSafety = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={stopMonitoring}
-                className="flex items-center gap-3 bg-gray-600 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest shadow-xl hover:bg-gray-500 transition-colors"
+                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gray-600 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest shadow-xl hover:bg-gray-500 transition-colors text-xs sm:text-sm"
               >
-                <Square size={24} />
+                <Square size={20} />
                 Stop Monitoring
               </motion.button>
             )}
@@ -374,9 +374,9 @@ const DriverSafety = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={scrollToHotspots}
-              className="flex items-center gap-3 bg-white/10 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest border border-white/20 hover:bg-white/20 transition-all shadow-xl backdrop-blur-md"
+              className="w-full sm:w-auto flex items-center justify-center gap-3 bg-white/10 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest border border-white/20 hover:bg-white/20 transition-all shadow-xl backdrop-blur-md text-xs sm:text-sm"
             >
-              <Map size={24} />
+              <Map size={20} />
               View Hotspots
             </motion.button>
           </div>

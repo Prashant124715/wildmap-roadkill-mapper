@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -25,7 +25,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { name: t('navbar.home'), path: "/" },
     {
       name: t('navbar.safety'),
@@ -58,7 +58,7 @@ const Navbar = () => {
       ]
     },
     { name: t('navbar.about'), path: "/about" }
-  ];
+  ], [t]);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const isHome = location.pathname === '/';
@@ -220,81 +220,78 @@ const Navbar = () => {
 
             {/* Mobile Menu Toggle */}
             <div className="flex items-center gap-3 lg:hidden">
-              <button onClick={toggleMobileMenu} className="p-2 text-gray-400 hover:text-white transition-colors">
-                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              <button 
+                onClick={toggleMobileMenu} 
+                className="relative z-[60] p-2 text-gray-400 hover:text-white transition-colors"
+                aria-label="Toggle menu"
+              >
+                <div className="relative w-6 h-6">
+                  <motion.span
+                    animate={isMobileMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+                    className="absolute top-0 left-0 block w-6 h-0.5 bg-current transition-transform"
+                  />
+                  <motion.span
+                    animate={isMobileMenuOpen ? { opacity: 0 } : { opacity: 1 }}
+                    className="absolute top-[11px] left-0 block w-6 h-0.5 bg-current transition-opacity"
+                  />
+                  <motion.span
+                    animate={isMobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+                    className="absolute bottom-0 left-0 block w-6 h-0.5 bg-current transition-transform"
+                  />
+                </div>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Navigation Dropdown */}
+        {/* Mobile Navigation Drawer */}
         <AnimatePresence>
           {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-[#0a0f0c]/98 backdrop-blur-3xl border-t border-white/10 overflow-y-auto max-h-[85vh] shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
-            >
-              <div className="px-4 py-8 space-y-6">
-
-                {navItems.map((item, idx) => (
-                  <div key={idx} className="space-y-3">
-                    {item.dropdown ? (
-                      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden p-2">
-                        <div className="text-xs font-bold text-brand-orange uppercase tracking-widest px-4 py-2 border-b border-white/5 mb-2">{item.name}</div>
-                        <div className="space-y-1">
-                          {item.dropdown.map((sub, sIdx) => (
-                            <Link
-                              key={sIdx}
-                              to={sub.path}
-                              onClick={() => setIsMobileMenuOpen(false)}
-                              className={clsx(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl transition-colors",
-                                location.pathname === sub.path ? "bg-brand-orange/10 border border-brand-orange/20" : "hover:bg-white/5"
-                              )}
-                            >
-                              <sub.icon size={18} className={location.pathname === sub.path ? "text-brand-orange" : "text-gray-400"} />
-                              <div>
-                                <div className={clsx("text-sm font-bold", location.pathname === sub.path ? "text-brand-orange" : "text-white")}>{sub.name}</div>
-                                <div className="text-[10px] text-gray-500 mt-0.5">{sub.desc}</div>
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <Link
-                        to={item.path}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className={clsx(
-                          "block px-4 py-3 text-sm font-bold uppercase tracking-widest transition-colors rounded-xl",
-                          location.pathname === item.path ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20" : "text-white bg-white/5 border border-white/10"
-                        )}
-                      >
-                        {item.name}
-                      </Link>
-                    )}
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[55]"
+              />
+              
+              {/* Drawer */}
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="lg:hidden fixed inset-y-0 right-0 w-[85%] max-w-sm bg-brand-dark/95 backdrop-blur-2xl border-l border-white/10 z-[56] flex flex-col shadow-[-20px_0_50px_rgba(0,0,0,0.5)]"
+              >
+                <div className="p-6 pt-24 overflow-y-auto custom-scrollbar flex-grow">
+                  <div className="space-y-4">
+                    {navItems.map((item, idx) => (
+                      <MobileNavItem key={idx} item={item} onClose={() => setIsMobileMenuOpen(false)} />
+                    ))}
                   </div>
-                ))}
-                
-                <div className="pt-6 border-t border-white/10">
+                </div>
+
+                <div className="p-6 border-t border-white/10 bg-black/20">
                   {user ? (
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 px-4 py-3 bg-brand-orange/10 border border-brand-orange/20 rounded-xl">
-                        <User size={20} className="text-brand-orange" />
-                        <span className="text-sm font-bold text-white uppercase tracking-widest">{user.name}</span>
+                        <div className="w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center border border-brand-orange/30">
+                          <User size={16} className="text-brand-orange" />
+                        </div>
+                        <span className="text-sm font-bold text-white uppercase tracking-widest truncate">{user.name}</span>
                       </div>
                       <Link 
                         to="/my-reports" 
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-4 text-sm font-bold text-gray-300 hover:text-white bg-white/5 border border-white/10 rounded-xl"
+                        className="flex items-center gap-3 px-4 py-4 text-sm font-bold text-gray-300 hover:text-white bg-white/5 border border-white/10 rounded-xl transition-colors"
                       >
-                        <Activity size={18} /> {t('navbar.myReports')}
+                        <Activity size={18} className="text-brand-orange" /> {t('navbar.myReports')}
                       </Link>
                       <button 
                         onClick={() => { logout(); setIsMobileMenuOpen(false); }}
-                        className="w-full flex items-center gap-3 px-4 py-4 text-sm font-bold text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl"
+                        className="w-full flex items-center gap-3 px-4 py-4 text-sm font-bold text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl transition-colors"
                       >
                         <LogOut size={18} /> {t('navbar.signOut')}
                       </button>
@@ -302,18 +299,94 @@ const Navbar = () => {
                   ) : (
                     <button
                       onClick={() => { openAuthModal(); setIsMobileMenuOpen(false); }}
-                      className="w-full bg-brand-orange text-white text-sm font-bold uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(255,107,0,0.3)]"
+                      className="w-full bg-brand-orange text-white text-sm font-bold uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(255,107,0,0.3)] active:scale-95 transition-all"
                     >
                       {t('navbar.signIn')}
                     </button>
                   )}
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </motion.nav>
     </>
+  );
+};
+
+// Mobile Accordion Nav Item
+const MobileNavItem = ({ item, onClose }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const isActive = item.path ? location.pathname === item.path : item.dropdown?.some(d => location.pathname === d.path);
+
+  if (!item.dropdown) {
+    return (
+      <Link
+        to={item.path}
+        onClick={onClose}
+        className={clsx(
+          "block px-4 py-4 text-sm font-bold uppercase tracking-widest transition-all rounded-xl border",
+          isActive ? "bg-brand-orange/10 text-brand-orange border-brand-orange/20" : "text-white bg-white/5 border-white/5"
+        )}
+      >
+        {item.name}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={clsx(
+          "w-full flex items-center justify-between px-4 py-4 text-sm font-bold uppercase tracking-widest transition-all rounded-xl border",
+          isActive ? "text-brand-orange border-brand-orange/20" : "text-white bg-white/5 border-white/5",
+          isOpen ? "bg-white/10" : ""
+        )}
+      >
+        {item.name}
+        <motion.div animate={{ rotate: isOpen ? 180 : 0 }}>
+          <ChevronDown size={18} />
+        </motion.div>
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-1 gap-2 p-1">
+              {item.dropdown.map((sub, sIdx) => (
+                <Link
+                  key={sIdx}
+                  to={sub.path}
+                  onClick={onClose}
+                  className={clsx(
+                    "flex items-center gap-4 px-4 py-4 rounded-xl transition-colors border",
+                    location.pathname === sub.path ? "bg-brand-orange/10 border-brand-orange/20" : "bg-white/[0.02] border-white/5"
+                  )}
+                >
+                  <div className={clsx(
+                    "w-10 h-10 rounded-full flex items-center justify-center shrink-0 border",
+                    location.pathname === sub.path ? "bg-brand-orange/20 border-brand-orange/30 shadow-[0_0_10px_rgba(255,107,0,0.2)]" : "bg-white/5 border-white/10"
+                  )}>
+                    <sub.icon size={18} className={location.pathname === sub.path ? "text-brand-orange" : "text-gray-400"} />
+                  </div>
+                  <div>
+                    <div className={clsx("text-[13px] font-bold tracking-wide", location.pathname === sub.path ? "text-brand-orange" : "text-white")}>{sub.name}</div>
+                    <div className="text-[10px] text-gray-500 mt-0.5 line-clamp-1">{sub.desc}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 

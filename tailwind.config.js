@@ -14,6 +14,9 @@ export default {
           dark: '#050a06', // Black/darker shade
         }
       },
+      screens: {
+        'xs': '480px',
+      },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         hero: ['Outfit', 'sans-serif'], // For large headings

@@ -88,7 +88,7 @@ const Home = () => {
 
         {/* Hero Content */}
         <motion.div
-          className="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto"
+          className="relative z-10 text-center px-4 sm:px-6 w-full max-w-5xl mx-auto pt-16 sm:pt-0"
           style={{ y: textY, opacity }}
         >
           {/* Badge */}
@@ -96,22 +96,22 @@ const Home = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="mb-8"
+            className="mb-4 sm:mb-8 md:mb-10"
           >
-            <div className="inline-flex items-center space-x-3 border border-white/15 px-5 py-2 rounded-full bg-white/5 backdrop-blur-sm">
-              <span className="w-2 h-2 rounded-full bg-brand-orange animate-pulse" />
-              <span className="text-[10px] sm:text-[11px] text-gray-300 uppercase tracking-[0.3em] font-light">{t('hero.badge')}</span>
+            <div className="inline-flex items-center space-x-2 sm:space-x-3 border border-white/15 px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-full bg-white/5 backdrop-blur-md">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-brand-orange animate-pulse" />
+              <span className="text-[8px] sm:text-[11px] text-gray-300 uppercase tracking-[0.2em] sm:tracking-[0.3em] font-bold">{t('hero.badge')}</span>
             </div>
           </motion.div>
 
-          {/* Title */}
+          {/* Title - Using clamp for perfect responsive scaling */}
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.6 }}
-            className="font-cinematic font-bold tracking-[0.15em] leading-none mb-6"
+            className="font-cinematic font-bold tracking-[0.05em] sm:tracking-[0.1em] leading-[1] sm:leading-[0.9] mb-6 sm:mb-8"
           >
-            <span className="block text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-white text-glow-gold">
+            <span className="block text-[clamp(2.2rem,10vw,8rem)] text-white text-glow-gold drop-shadow-2xl">
               {t('hero.title')}
             </span>
           </motion.h1>
@@ -121,11 +121,11 @@ const Home = () => {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 1, delay: 1.1 }}
-            className="flex items-center justify-center gap-3 mb-6"
+            className="flex items-center justify-center gap-3 mb-6 sm:mb-8"
           >
-            <div className="h-px w-16 sm:w-24 bg-gradient-to-r from-transparent to-brand-orange/50" />
-            <Leaf size={14} className="text-brand-orange/70" />
-            <div className="h-px w-16 sm:w-24 bg-gradient-to-l from-transparent to-brand-orange/50" />
+            <div className="h-px w-8 sm:w-24 bg-gradient-to-r from-transparent to-brand-orange/50" />
+            <Leaf size={12} className="text-brand-orange/70 sm:w-[14px] sm:h-[14px]" />
+            <div className="h-px w-8 sm:w-24 bg-gradient-to-l from-transparent to-brand-orange/50" />
           </motion.div>
 
           {/* Subtitle */}
@@ -133,7 +133,7 @@ const Home = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 1.3 }}
-            className="font-serif-elegant text-gray-300 text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed italic"
+            className="font-serif-elegant text-gray-300 text-xs sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed italic px-2 sm:px-0"
           >
             {t('hero.subtitle')}
           </motion.p>
@@ -143,46 +143,43 @@ const Home = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 1.6 }}
-            className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-5"
+            className="flex flex-col xs:flex-row justify-center gap-3 sm:gap-6 px-4 sm:px-0"
           >
-            <Link to="/analysis">
+            <Link to="/analysis" className="w-full xs:w-auto">
               <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="relative group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand-orange text-white font-bold uppercase tracking-[0.2em] text-xs rounded overflow-hidden transition-all duration-300 shadow-[0_0_25px_rgba(255,92,0,0.25)] hover:shadow-[0_0_45px_rgba(255,92,0,0.5)]"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative group w-full inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-4 sm:py-5 bg-brand-orange text-white font-bold uppercase tracking-[0.2em] text-[9px] sm:text-xs rounded overflow-hidden transition-all duration-300 shadow-[0_0_25px_rgba(255,92,0,0.25)]"
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  <Compass size={16} />
-                  {t('hero.exploreHotspots')}
-                </span>
-                <div className="absolute inset-0 bg-white/15 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                <Compass size={16} className="sm:w-[18px] sm:h-[18px]" />
+                {t('hero.exploreHotspots')}
               </motion.button>
             </Link>
-            <Link to="/reports/incident">
+            <Link to="/reports/incident" className="w-full xs:w-auto">
               <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-transparent border border-white/20 text-white font-bold uppercase tracking-[0.2em] text-xs rounded transition-all duration-300 hover:border-white/40 hover:bg-white/5"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-4 sm:py-5 bg-black/40 backdrop-blur-md border border-white/20 text-white font-bold uppercase tracking-[0.2em] text-[9px] sm:text-xs rounded transition-all duration-300 hover:border-white/40 hover:bg-white/10"
               >
-                <AlertTriangle size={16} />
+                <AlertTriangle size={16} className="sm:w-[18px] sm:h-[18px]" />
                 {t('hero.reportIncident')}
               </motion.button>
             </Link>
           </motion.div>
         </motion.div>
 
-        {/* Bottom stats strip */}
+        {/* Bottom stats strip - Improved for mobile stacking */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 2 }}
-          className="absolute bottom-8 left-0 right-0 z-10 px-4"
+          className="absolute bottom-8 sm:bottom-12 left-0 right-0 z-10 px-4"
         >
-          <div className="max-w-4xl mx-auto flex justify-center gap-8 sm:gap-16">
+          <div className="max-w-5xl mx-auto flex flex-wrap justify-center gap-6 sm:gap-16 items-center">
             <StatItem value="40+" label={t('hero.incidentsMapped')} />
-            <div className="w-px bg-white/10 hidden sm:block" />
+            <div className="hidden sm:block w-px h-8 bg-white/10" />
             <StatItem value="18" label={t('hero.speciesTracked')} />
-            <div className="w-px bg-white/10 hidden sm:block" />
+            <div className="hidden sm:block w-px h-8 bg-white/10" />
             <StatItem value="12" label={t('hero.activeHotspots')} />
           </div>
         </motion.div>

@@ -102,26 +102,26 @@ const AdminDashboard = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-brand-dark via-brand-dark/90 to-transparent"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark to-transparent opacity-80"></div>
 
-        <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="relative z-10 p-6 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="flex h-3 w-3 relative">
+            <div className="flex items-center gap-3 mb-3 sm:mb-4">
+              <span className="flex h-2.5 w-2.5 sm:h-3 sm:w-3 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-lightGreen opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-brand-lightGreen"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-brand-lightGreen"></span>
               </span>
-              <p className="text-brand-lightGreen text-xs font-bold uppercase tracking-[0.2em]">Real-Time Conservation Monitoring</p>
+              <p className="text-brand-lightGreen text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em]">Real-Time Monitoring</p>
             </div>
-            <h1 className="text-4xl md:text-5xl font-cinematic font-bold text-white uppercase tracking-widest mb-4 leading-tight">AI Wildlife Intelligence Center</h1>
-            <p className="text-gray-300 text-sm md:text-base leading-relaxed border-l-2 border-brand-orange pl-4 max-w-2xl backdrop-blur-sm bg-black/10 p-2 rounded-r-lg">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-cinematic font-bold text-white uppercase tracking-widest mb-3 sm:mb-4 leading-tight">AI Wildlife Intelligence</h1>
+            <p className="text-gray-300 text-[11px] sm:text-sm md:text-base leading-relaxed border-l-2 border-brand-orange pl-4 max-w-2xl backdrop-blur-sm bg-black/10 p-2 rounded-r-lg">
               Protecting biodiversity through predictive machine learning, community empowerment, and intelligent hotspot verification.
             </p>
           </div>
           
-          <div className="hidden md:flex flex-col items-end gap-2 text-right">
-            <p className="text-xs text-gray-400 tracking-widest uppercase">{t('admin.opsCenter')}</p>
-            <div className="flex items-center gap-2 bg-black/50 border border-white/10 px-4 py-2 rounded-full backdrop-blur-md">
-              <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-500 animate-pulse' : firebaseError ? 'bg-red-500' : 'bg-brand-lightGreen shadow-[0_0_10px_rgba(34,197,94,0.8)]'}`}></div>
-              <p className="text-[10px] text-white uppercase tracking-widest font-bold">
+          <div className="flex flex-col items-start md:items-end gap-2 md:text-right">
+            <p className="text-[9px] sm:text-xs text-gray-400 tracking-widest uppercase">{t('admin.opsCenter')}</p>
+            <div className="flex items-center gap-2 bg-black/50 border border-white/10 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full backdrop-blur-md">
+              <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isLoading ? 'bg-yellow-500 animate-pulse' : firebaseError ? 'bg-red-500' : 'bg-brand-lightGreen shadow-[0_0_10px_rgba(34,197,94,0.8)]'}`}></div>
+              <p className="text-[9px] sm:text-[10px] text-white uppercase tracking-widest font-bold">
                 {isLoading ? t('admin.dbConnecting') : firebaseError ? t('admin.dbError') : t('admin.dbOnline')}
               </p>
             </div>

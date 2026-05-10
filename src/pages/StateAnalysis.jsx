@@ -82,19 +82,20 @@ const StateAnalysis = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Left: Map & Charts */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-6 sm:space-y-8">
           
           <Card className="bg-brand-dark/80 backdrop-blur-xl border-white/10 p-0 overflow-hidden relative">
-            <div className="absolute top-4 left-4 z-[400] bg-black/60 backdrop-blur px-4 py-2 rounded-lg border border-white/10 pointer-events-none">
-              <h3 className="text-white font-bold text-sm tracking-widest uppercase mb-2">{t('hotspots.mapTitle')}</h3>
-              <div className="flex items-center gap-4 text-xs text-gray-300">
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-red-500 rounded-sm"></span> {t('hotspots.highRisk')}</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-orange-500 rounded-sm"></span> {t('hotspots.mediumRisk')}</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-green-500 rounded-sm"></span> {t('hotspots.lowRisk')}</div>
+            {/* Improved Legend for Mobile */}
+            <div className="absolute top-2 left-2 right-2 sm:top-4 sm:left-4 sm:right-auto z-[400] bg-black/80 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg border border-white/10 pointer-events-none">
+              <h3 className="text-white font-bold text-[10px] sm:text-sm tracking-widest uppercase mb-1.5 sm:mb-2">{t('hotspots.mapTitle')}</h3>
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-[9px] sm:text-xs text-gray-300">
+                <div className="flex items-center gap-1.5"><span className="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-sm"></span> {t('hotspots.highRisk')}</div>
+                <div className="flex items-center gap-1.5"><span className="w-2 h-2 sm:w-3 sm:h-3 bg-orange-500 rounded-sm"></span> {t('hotspots.mediumRisk')}</div>
+                <div className="flex items-center gap-1.5"><span className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-sm"></span> {t('hotspots.lowRisk')}</div>
               </div>
             </div>
             
-            <div className="h-[500px] w-full bg-[#0a0a0a]">
+            <div className="h-[350px] xs:h-[400px] sm:h-[500px] w-full bg-[#0a0a0a]">
               {!isOnline ? (
                 <div className="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-[#0a0a0a]">
                   <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-widest">Map Unavailable</h3>
@@ -103,7 +104,7 @@ const StateAnalysis = () => {
               ) : (
                 <MapContainer 
                   center={[22.5937, 78.9629]} 
-                  zoom={4.5} 
+                  zoom={window.innerWidth < 640 ? 3.5 : 4.5} 
                   style={{ height: '100%', width: '100%' }}
                   zoomControl={false}
                   attributionControl={false}
@@ -122,19 +123,19 @@ const StateAnalysis = () => {
             </div>
           </Card>
 
-          <Card className="bg-brand-dark/80 backdrop-blur-xl border-white/10">
-            <h3 className="text-white font-bold text-sm tracking-widest uppercase mb-6 flex items-center gap-2">
+          <Card className="bg-brand-dark/80 backdrop-blur-xl border-white/10 p-5 sm:p-8">
+            <h3 className="text-white font-bold text-xs sm:text-sm tracking-widest uppercase mb-6 flex items-center gap-2">
               <TrendingUp size={16} className="text-brand-orange" />
               {t('hotspots.incidentVolume')}
             </h3>
-            <div className="h-[300px] w-full">
+            <div className="h-[250px] sm:h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stateRiskData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <XAxis dataKey="id" stroke="#525252" tick={{fill: '#9ca3af', fontSize: 12}} />
-                  <YAxis stroke="#525252" tick={{fill: '#9ca3af', fontSize: 12}} />
+                <BarChart data={stateRiskData} margin={{ top: 10, right: 10, left: -30, bottom: 0 }}>
+                  <XAxis dataKey="id" stroke="#525252" tick={{fill: '#9ca3af', fontSize: 10}} />
+                  <YAxis stroke="#525252" tick={{fill: '#9ca3af', fontSize: 10}} />
                   <Tooltip 
                     cursor={{fill: 'rgba(255,255,255,0.05)'}}
-                    contentStyle={{ backgroundColor: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                    contentStyle={{ backgroundColor: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '10px' }}
                   />
                   <Bar dataKey="incidents" radius={[4, 4, 0, 0]}>
                     {stateRiskData.map((entry, index) => (

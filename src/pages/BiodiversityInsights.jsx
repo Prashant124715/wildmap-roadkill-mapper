@@ -27,33 +27,33 @@ const AnimalCard = ({ animal, index }) => {
       className="group glass-panel rounded-2xl overflow-hidden border border-white/10 hover:border-brand-lightGreen/40 transition-all duration-500 hover:shadow-[0_8px_40px_rgba(59,139,84,0.15)]">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
         {/* Image */}
-        <div className="lg:col-span-4 relative overflow-hidden h-56 lg:h-auto bg-brand-dark">
+        <div className="lg:col-span-4 relative overflow-hidden h-64 sm:h-80 lg:h-auto bg-brand-dark">
           <img 
             src={animal.image} 
             alt={animal.name} 
             onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80'; }}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100" 
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4">
-            <h3 className="text-2xl font-hero font-bold text-white">{animal.name}</h3>
-            <p className="text-xs text-gray-300 italic">{animal.scientificName}</p>
-            <div className="flex gap-2 mt-2">
-              <span className={`text-[10px] px-2 py-0.5 rounded-full border ${statusColor[animal.conservationStatus] || ''}`}>{animal.conservationStatus}</span>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full ${frequencyColor[animal.frequency] || ''}`}>{animal.frequency} {t('biodiversity.frequencySuffix')}</span>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4 lg:bottom-6 lg:left-6">
+            <h3 className="text-2xl md:text-3xl font-hero font-bold text-white leading-tight">{animal.name}</h3>
+            <p className="text-xs md:text-sm text-gray-300 italic mb-3">{animal.scientificName}</p>
+            <div className="flex flex-wrap gap-2">
+              <span className={`text-[10px] md:text-[11px] px-3 py-1 rounded-full border backdrop-blur-md ${statusColor[animal.conservationStatus] || ''}`}>{animal.conservationStatus}</span>
+              <span className={`text-[10px] md:text-[11px] px-3 py-1 rounded-full backdrop-blur-md ${frequencyColor[animal.frequency] || ''}`}>{animal.frequency} {t('biodiversity.frequencySuffix')}</span>
             </div>
           </div>
         </div>
 
         {/* Details */}
-        <div className="lg:col-span-8 p-6 space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="lg:col-span-8 p-5 sm:p-8 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <InfoBlock icon={MapPin} label={t('biodiversity.observationZones')} color="text-brand-lightGreen">
-              <ul className="space-y-1">{animal.observationZones.map((z, i) => <li key={i} className="text-xs text-gray-300 flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-brand-lightGreen" />{z}</li>)}</ul>
+              <ul className="grid grid-cols-1 xs:grid-cols-2 gap-y-1 gap-x-4">{animal.observationZones.map((z, i) => <li key={i} className="text-xs text-gray-300 flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-brand-lightGreen" />{z}</li>)}</ul>
             </InfoBlock>
-            <InfoBlock icon={Calendar} label={t('biodiversity.bestMonths')} color="text-brand-orange"><p className="text-sm text-gray-300">{animal.bestMonths}</p></InfoBlock>
-            <InfoBlock icon={Clock} label={t('biodiversity.bestTime')} color="text-sky-400"><p className="text-sm text-gray-300">{animal.bestTime}</p></InfoBlock>
-            <InfoBlock icon={Trees} label={t('biodiversity.habitat')} color="text-emerald-400"><p className="text-sm text-gray-300">{animal.habitat}</p></InfoBlock>
+            <InfoBlock icon={Calendar} label={t('biodiversity.bestMonths')} color="text-brand-orange"><p className="text-sm text-gray-300 font-medium">{animal.bestMonths}</p></InfoBlock>
+            <InfoBlock icon={Clock} label={t('biodiversity.bestTime')} color="text-sky-400"><p className="text-sm text-gray-300 font-medium">{animal.bestTime}</p></InfoBlock>
+            <InfoBlock icon={Trees} label={t('biodiversity.habitat')} color="text-emerald-400"><p className="text-sm text-gray-300 font-medium">{animal.habitat}</p></InfoBlock>
           </div>
 
           {/* Ethical Tip */}
