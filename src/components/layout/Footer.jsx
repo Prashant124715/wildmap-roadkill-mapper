@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Github, Linkedin, Twitter, Instagram, Shield, Heart, MapPin, Mail } from 'lucide-react';
+import { Shield, Heart, MapPin, Mail, Globe, Code, Briefcase, Camera } from 'lucide-react';
 import logo from '../../assets/images/logo.png';
 
 const Footer = () => {
@@ -29,10 +29,10 @@ const Footer = () => {
               {t('home.heroSubtitle')}
             </p>
             <div className="flex items-center gap-4">
-              <SocialLink icon={Github} href="#" />
-              <SocialLink icon={Linkedin} href="#" />
-              <SocialLink icon={Twitter} href="#" />
-              <SocialLink icon={Instagram} href="#" />
+              <SocialLink icon={Code} href="#" />
+              <SocialLink icon={Briefcase} href="#" />
+              <SocialLink icon={Globe} href="#" />
+              <SocialLink icon={Camera} href="#" />
             </div>
           </div>
 
