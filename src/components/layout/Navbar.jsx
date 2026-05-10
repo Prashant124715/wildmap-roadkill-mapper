@@ -1,29 +1,64 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, LogOut, Menu, X } from 'lucide-react';
+import { User, LogOut, Menu, X, Languages, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { useAuth } from '../../contexts/AuthContext';
 import logo from '../../assets/images/logo.png';
 
 const Navbar = () => {
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const { user, openAuthModal, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇬🇧' },
+    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+  ];
+
+  const currentLang = languages.find(l => l.code === i18n.language) || languages[0];
+
+  const changeLanguage = (code) => {
+    i18n.changeLanguage(code);
+    setIsLangOpen(false);
+  };
+
   const links = [
-    { name: 'HOME', path: '/' },
-    { name: 'DASHBOARD', path: '/analysis' },
-    { name: 'MAP', path: '/map' },
-    { name: 'GALLERY', path: '/gallery' },
-    { name: 'RESOURCES', path: '/resources' },
-    { name: 'CONTACT', path: '/contact' }
+    { name: t('navbar.home'), path: '/' },
+    { name: t('navbar.hotspots'), path: '/analysis' },
+    { name: t('navbar.map'), path: '/map' },
+    { name: t('navbar.biodiversity'), path: '/biodiversity' },
+    { name: t('navbar.gallery'), path: '/gallery' },
+    { name: t('navbar.report'), path: '/contact' },
+    { name: t('navbar.resources'), path: '/resources' },
   ];
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
+  const isHome = location.pathname === '/';
+
   return (
-    <nav className="sticky top-0 z-50 w-full glass-panel border-b border-white/10 backdrop-blur-lg">
+    <motion.nav
+      initial={false}
+      animate={{
+        backgroundColor: scrolled || !isHome ? 'rgba(5,10,6,0.92)' : 'rgba(5,10,6,0)',
+        backdropFilter: scrolled || !isHome ? 'blur(20px)' : 'blur(0px)',
+        borderBottomColor: scrolled || !isHome ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0)',
+      }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className="fixed top-0 z-50 w-full border-b"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           
@@ -34,20 +69,20 @@ const Navbar = () => {
               className="h-8 sm:h-10 w-auto object-contain group-hover:scale-110 transition-transform duration-300"
             />
             <div className="block">
-              <h1 className="text-lg sm:text-xl font-hero font-bold tracking-widest text-white leading-none">WILDMAP</h1>
-              <span className="text-[8px] sm:text-[10px] text-gray-400 tracking-[0.2em] uppercase">Roadkill Hotspot Mapper</span>
+              <h1 className="text-lg sm:text-xl font-cinematic font-bold tracking-[0.25em] text-white leading-none">WILDMAP</h1>
+              <span className="text-[8px] sm:text-[10px] text-gray-400 tracking-[0.2em] uppercase font-light">{t('navbar.conservationIntelligence')}</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex space-x-6 items-center">
+          <div className="hidden lg:flex space-x-5 items-center">
             {links.map((link) => {
               const isActive = location.pathname === link.path;
               return (
                 <Link
                   key={link.name}
                   to={link.path}
-                  className="relative px-1 py-2 text-xs font-medium tracking-widest transition-colors duration-300"
+                  className="relative px-1 py-2 text-[11px] font-medium tracking-[0.15em] transition-colors duration-300"
                 >
                   <span className={clsx(
                     "relative z-10",
@@ -81,13 +116,13 @@ const Navbar = () => {
                       to="/my-reports" 
                       className="block px-4 py-3 text-xs text-gray-300 hover:text-white hover:bg-brand-orange/10 transition-colors"
                     >
-                      My Reports
+                      {t('navbar.myReports')}
                     </Link>
                     <button 
                       onClick={logout}
                       className="w-full text-left px-4 py-3 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors border-t border-white/10"
                     >
-                      Sign Out
+                      {t('navbar.signOut')}
                     </button>
                   </div>
                 </div>
@@ -96,7 +131,7 @@ const Navbar = () => {
                   onClick={openAuthModal}
                   className="bg-brand-orange hover:bg-brand-orange/90 text-white text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full transition-colors"
                 >
-                  Sign In
+                  {t('navbar.signIn')}
                 </button>
               )}
             </div>
@@ -122,6 +157,7 @@ const Navbar = () => {
             className="lg:hidden bg-brand-dark/95 backdrop-blur-xl border-t border-white/10 overflow-hidden"
           >
             <div className="px-4 py-6 space-y-4">
+
               {links.map((link) => (
                 <Link
                   key={link.name}
@@ -148,13 +184,13 @@ const Navbar = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="block px-4 py-3 text-sm text-gray-400 hover:text-white"
                     >
-                      My Reports
+                      {t('navbar.myReports')}
                     </Link>
                     <button 
                       onClick={() => { logout(); setIsMobileMenuOpen(false); }}
                       className="w-full text-left px-4 py-3 text-sm text-red-400 flex items-center gap-2"
                     >
-                      <LogOut size={16} /> Sign Out
+                      <LogOut size={16} /> {t('navbar.signOut')}
                     </button>
                   </div>
                 ) : (
@@ -162,7 +198,7 @@ const Navbar = () => {
                     onClick={() => { openAuthModal(); setIsMobileMenuOpen(false); }}
                     className="w-full bg-brand-orange text-white text-sm font-bold uppercase tracking-widest py-4 rounded-lg"
                   >
-                    Sign In
+                    {t('navbar.signIn')}
                   </button>
                 )}
               </div>
@@ -170,7 +206,7 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </motion.nav>
   );
 };
 

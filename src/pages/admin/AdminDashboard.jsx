@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Clock, CheckCircle, AlertTriangle, Flame, WifiOff } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 import { db } from '../../lib/firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
@@ -13,6 +14,7 @@ const Card = ({ children, className = "" }) => (
 );
 
 const AdminDashboard = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     total: 128,
     pending: 34,
@@ -84,10 +86,10 @@ const AdminDashboard = () => {
   }, []);
 
   const statCards = [
-    { title: 'Total Reports', value: stats.total, icon: FileText, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-    { title: 'Pending Review', value: stats.pending, icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
-    { title: 'Verified Incidents', value: stats.verified, icon: CheckCircle, color: 'text-brand-lightGreen', bg: 'bg-brand-lightGreen/10' },
-    { title: 'High-Risk Zones', value: stats.highRisk, icon: Flame, color: 'text-brand-orange', bg: 'bg-brand-orange/10' },
+    { title: t('admin.totalReports'), value: stats.total, icon: FileText, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+    { title: t('admin.pendingReview'), value: stats.pending, icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
+    { title: t('admin.verifiedIncidents'), value: stats.verified, icon: CheckCircle, color: 'text-brand-lightGreen', bg: 'bg-brand-lightGreen/10' },
+    { title: t('admin.highRiskZones'), value: stats.highRisk, icon: Flame, color: 'text-brand-orange', bg: 'bg-brand-orange/10' },
   ];
 
   return (
@@ -95,39 +97,19 @@ const AdminDashboard = () => {
       
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-3xl font-hero font-bold text-white uppercase tracking-wider mb-1">System Overview</h2>
+          <h2 className="text-3xl font-hero font-bold text-white uppercase tracking-wider mb-1">{t('admin.overview')}</h2>
           <div className="flex items-center gap-2">
-            <p className="text-xs text-gray-400 tracking-widest uppercase">Admin Operations Center</p>
+            <p className="text-xs text-gray-400 tracking-widest uppercase">{t('admin.opsCenter')}</p>
             <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
             <div className="flex items-center gap-1.5">
               <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-500 animate-pulse' : firebaseError ? 'bg-red-500' : 'bg-brand-lightGreen'}`}></div>
               <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
-                {isLoading ? 'Connecting to Database...' : firebaseError ? 'Connection Error' : 'Database Online'}
+                {isLoading ? t('admin.dbConnecting') : firebaseError ? t('admin.dbError') : t('admin.dbOnline')}
               </p>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Firebase Error Banner */}
-      {firebaseError && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3"
-        >
-          <WifiOff size={20} className="text-red-400 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-bold text-red-400">Firebase Connection Error</p>
-            <p className="text-xs text-gray-400 mt-1">{firebaseError}</p>
-            <p className="text-xs text-gray-500 mt-2">
-              Make sure your Firestore rules allow reads. Go to Firebase Console → Firestore Database → Rules and set:
-              <code className="block bg-black/50 p-2 rounded mt-1 text-brand-orange font-mono">
-                {`rules_version = '2'; service cloud.firestore { match /databases/{database}/documents { match /{document=**} { allow read, write: if true; } } }`}
-              </code>
-            </p>
-          </div>
-        </motion.div>
-      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -160,7 +142,7 @@ const AdminDashboard = () => {
           className="lg:col-span-2 bg-black/40 border border-white/10 rounded-xl p-6 backdrop-blur-sm"
         >
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-sm font-bold text-white uppercase tracking-widest">Reporting Trends (7 Days)</h3>
+            <h3 className="text-sm font-bold text-white uppercase tracking-widest">{t('admin.trends')}</h3>
           </div>
           
           <div className="h-72 w-full">
@@ -185,35 +167,35 @@ const AdminDashboard = () => {
           </div>
         </motion.div>
 
-        {/* System Alerts - now dynamic */}
+        {/* System Alerts */}
         <motion.div 
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
           className="bg-black/40 border border-white/10 rounded-xl p-6 backdrop-blur-sm flex flex-col"
         >
-          <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">System Alerts</h3>
+          <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">{t('admin.alerts')}</h3>
           
           <div className="space-y-4 flex-1">
             <div className="flex gap-3 bg-brand-orange/5 border border-brand-orange/20 p-3 rounded-lg">
               <AlertTriangle size={16} className="text-brand-orange shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-white">High Activity Detected</p>
-                <p className="text-[10px] text-gray-400 mt-1">High activity detected on Mumbai-Pune Expressway. Increased surveillance recommended.</p>
+                <p className="text-xs font-bold text-white">{t('admin.highActivity')}</p>
+                <p className="text-[10px] text-gray-400 mt-1">{t('admin.highActivityDesc')}</p>
               </div>
             </div>
             
             <div className="flex gap-3 bg-white/5 border border-white/10 p-3 rounded-lg">
               <Clock size={16} className="text-blue-400 shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-white">Night-time Trends</p>
-                <p className="text-[10px] text-gray-400 mt-1">Night-time incidents increasing (9 PM – 3 AM). Hotspot markers updated.</p>
+                <p className="text-xs font-bold text-white">{t('admin.nightTrends')}</p>
+                <p className="text-[10px] text-gray-400 mt-1">{t('admin.nightTrendsDesc')}</p>
               </div>
             </div>
 
             <div className="flex gap-3 bg-brand-orange/5 border border-brand-orange/20 p-3 rounded-lg">
               <CheckCircle size={16} className="text-brand-orange shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-white">Urgent Verification</p>
-                <p className="text-[10px] text-gray-400 mt-1">3 reports pending urgent verification. Action required in the queue.</p>
+                <p className="text-xs font-bold text-white">{t('admin.urgentVerification')}</p>
+                <p className="text-[10px] text-gray-400 mt-1">{t('admin.urgentVerificationDesc')}</p>
               </div>
             </div>
           </div>

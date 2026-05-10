@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ShieldAlert, TrendingUp, AlertTriangle, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Card from '../components/ui/Card';
 import { stateRiskData, verifiedIncidents } from '../data/realIncidents';
 import 'leaflet/dist/leaflet.css';
@@ -10,6 +11,7 @@ import 'leaflet/dist/leaflet.css';
 import { useNetwork } from '../hooks/useNetwork';
 
 const StateAnalysis = () => {
+  const { t } = useTranslation();
   const isOnline = useNetwork();
   const [geoData, setGeoData] = useState(null);
   const [selectedState, setSelectedState] = useState(stateRiskData[0]);
@@ -69,11 +71,11 @@ const StateAnalysis = () => {
       <div className="mb-12">
         <div className="inline-flex items-center space-x-2 border border-brand-orange/30 px-3 py-1 rounded-full mb-4 bg-brand-orange/5">
           <ShieldAlert size={14} className="text-brand-orange" />
-          <span className="text-[10px] text-brand-orange uppercase tracking-[0.2em]">National Dashboard</span>
+          <span className="text-[10px] text-brand-orange uppercase tracking-[0.2em]">{t('hotspots.badge')}</span>
         </div>
-        <h2 className="text-4xl md:text-5xl font-hero font-bold text-white uppercase mb-4">State Analysis</h2>
+        <h2 className="text-4xl md:text-5xl font-hero font-bold text-white uppercase mb-4">{t('hotspots.title')}</h2>
         <p className="text-gray-400 max-w-3xl text-sm leading-relaxed">
-          Aggregated wildlife-vehicle collision data across Indian states. Data is compiled from verifiable government reports, NGO findings, and research papers (e.g., WII, NCF). Accuracy is prioritized to highlight true ecological impact zones.
+          {t('hotspots.subtitle')} {t('hotspots.riskInfo')}
         </p>
       </div>
 
@@ -84,11 +86,11 @@ const StateAnalysis = () => {
           
           <Card className="bg-brand-dark/80 backdrop-blur-xl border-white/10 p-0 overflow-hidden relative">
             <div className="absolute top-4 left-4 z-[400] bg-black/60 backdrop-blur px-4 py-2 rounded-lg border border-white/10 pointer-events-none">
-              <h3 className="text-white font-bold text-sm tracking-widest uppercase mb-2">Choropleth Map (India)</h3>
+              <h3 className="text-white font-bold text-sm tracking-widest uppercase mb-2">{t('hotspots.mapTitle')}</h3>
               <div className="flex items-center gap-4 text-xs text-gray-300">
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-red-500 rounded-sm"></span> High Risk</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-orange-500 rounded-sm"></span> Medium</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-green-500 rounded-sm"></span> Low</div>
+                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-red-500 rounded-sm"></span> {t('hotspots.highRisk')}</div>
+                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-orange-500 rounded-sm"></span> {t('hotspots.mediumRisk')}</div>
+                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-green-500 rounded-sm"></span> {t('hotspots.lowRisk')}</div>
               </div>
             </div>
             
@@ -123,7 +125,7 @@ const StateAnalysis = () => {
           <Card className="bg-brand-dark/80 backdrop-blur-xl border-white/10">
             <h3 className="text-white font-bold text-sm tracking-widest uppercase mb-6 flex items-center gap-2">
               <TrendingUp size={16} className="text-brand-orange" />
-              Incident Volume by State
+              {t('hotspots.incidentVolume')}
             </h3>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -159,33 +161,33 @@ const StateAnalysis = () => {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h3 className="text-2xl font-bold text-white font-hero">{selectedState.state}</h3>
-                  <span className="text-xs text-gray-400 uppercase tracking-widest">National Rank: #{selectedState.rank}</span>
+                  <span className="text-xs text-gray-400 uppercase tracking-widest">{t('hotspots.nationalRank')}: #{selectedState.rank}</span>
                 </div>
                 <div className={`px-3 py-1 rounded text-[10px] font-bold tracking-wider uppercase ${selectedState.level === 'High Risk' ? 'bg-red-500/20 text-red-500' : selectedState.level === 'Medium Risk' ? 'bg-orange-500/20 text-orange-500' : 'bg-green-500/20 text-green-500'}`}>
-                  {selectedState.level}
+                  {selectedState.level === 'High Risk' ? t('hotspots.highRisk') : selectedState.level === 'Medium Risk' ? t('hotspots.mediumRisk') : t('hotspots.lowRisk')}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-black/30 rounded-lg p-4 border border-white/5">
-                  <span className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Incidents</span>
+                  <span className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">{t('hotspots.totalIncidents')}</span>
                   <span className="text-3xl font-hero font-bold text-white">{selectedState.incidents}</span>
                 </div>
                 <div className="bg-black/30 rounded-lg p-4 border border-white/5">
-                  <span className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Risk Score</span>
+                  <span className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">{t('hotspots.riskScore')}</span>
                   <span className="text-3xl font-hero font-bold text-brand-orange">{selectedState.riskScore}/100</span>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <span className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Primary Hotspot Highlight</span>
+                  <span className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">{t('hotspots.hotspotHighlight')}</span>
                   <p className="text-sm text-gray-300 border-l-2 border-brand-orange pl-3 py-1">{selectedState.highlight}</p>
                 </div>
                 <div className="bg-brand-orange/5 border border-brand-orange/20 rounded p-3 flex items-start gap-2">
                   <Info size={14} className="text-brand-orange shrink-0 mt-0.5" />
                   <p className="text-xs text-brand-orange/80">
-                    Risk score calculated using baseline incident density, frequency of critically endangered species mortality, and road network density.
+                    {t('hotspots.riskInfo')}
                   </p>
                 </div>
               </div>
@@ -196,7 +198,7 @@ const StateAnalysis = () => {
           <Card className="bg-brand-dark/80 backdrop-blur-xl border-white/10">
             <h3 className="text-white font-bold text-sm tracking-widest uppercase mb-4 flex items-center gap-2">
               <AlertTriangle size={16} className="text-red-500" />
-              Verified Case Studies
+              {t('hotspots.caseStudies')}
             </h3>
             <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
               {verifiedIncidents.map(incident => (
@@ -206,9 +208,9 @@ const StateAnalysis = () => {
                     <span className="text-[10px] text-red-400 uppercase tracking-wider font-bold">{incident.severity}</span>
                   </div>
                   <h4 className="text-brand-orange font-bold text-sm mb-1">{incident.location}</h4>
-                  <p className="text-xs text-gray-300 mb-2">Species: <span className="text-white">{incident.species}</span></p>
+                  <p className="text-xs text-gray-300 mb-2">{t('hotspots.species')}: <span className="text-white">{incident.species}</span></p>
                   <p className="text-[11px] text-gray-400 leading-relaxed mb-2">{incident.description}</p>
-                  <span className="text-[9px] text-gray-500 uppercase">Source: {incident.source}</span>
+                  <span className="text-[9px] text-gray-500 uppercase">{t('hotspots.source')}: {incident.source}</span>
                 </div>
               ))}
             </div>

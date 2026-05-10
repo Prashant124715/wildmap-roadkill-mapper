@@ -1,11 +1,13 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Search, Filter, ShieldAlert } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import galleryData from '../data/galleryData.json';
 import GalleryCard from '../components/gallery/GalleryCard';
 import GalleryModal from '../components/gallery/GalleryModal';
 
 const Gallery = () => {
+  const { t } = useTranslation();
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -41,20 +43,20 @@ const Gallery = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="inline-flex items-center space-x-2 border border-brand-orange/30 px-4 py-1.5 rounded-full mb-6 bg-brand-orange/10 backdrop-blur">
             <Camera size={14} className="text-brand-orange" />
-            <span className="text-[10px] text-brand-orange font-bold uppercase tracking-[0.2em]">Verified Visual Evidence</span>
+            <span className="text-[10px] text-brand-orange font-bold uppercase tracking-[0.2em]">{t('gallery.badge')}</span>
           </div>
           
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-hero font-bold mb-6 text-white uppercase tracking-tight">
-            Impact <span className="text-brand-orange">Gallery</span>
+            {t('gallery.title').split(' ')[0]} <span className="text-brand-orange">{t('gallery.title').split(' ')[1]}</span>
           </h2>
           
           <div className="max-w-3xl mx-auto bg-black/40 border border-white/10 p-6 rounded-xl backdrop-blur-sm">
             <div className="flex items-start gap-4 text-left">
               <ShieldAlert size={32} className="text-brand-orange shrink-0 mt-1" />
               <div>
-                <h3 className="text-white font-bold tracking-widest uppercase mb-2">Every Image Tells a Story</h3>
+                <h3 className="text-white font-bold tracking-widest uppercase mb-2">{t('gallery.storyTitle')}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Each image below represents a real environmental impact on our infrastructure. We document these incidents not for spectacle, but to connect raw data with the reality of human-wildlife conflict. <strong className="text-white">Awareness is the first step toward systemic prevention.</strong>
+                  {t('gallery.storyDesc')}
                 </p>
               </div>
             </div>
@@ -71,7 +73,7 @@ const Gallery = () => {
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
             <input 
               type="text" 
-              placeholder="Search by animal, location, or keyword..."
+              placeholder={t('gallery.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-black/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white outline-none focus:border-brand-orange transition-colors"
@@ -88,7 +90,7 @@ const Gallery = () => {
                 className="w-full sm:w-48 bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 outline-none focus:border-brand-orange transition-colors appearance-none"
               >
                 {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat === 'All' ? 'All Categories' : cat}</option>
+                  <option key={cat} value={cat}>{cat === 'All' ? t('gallery.allCategories') : cat}</option>
                 ))}
               </select>
             </div>
@@ -99,7 +101,7 @@ const Gallery = () => {
               className="w-full sm:w-48 bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 outline-none focus:border-brand-orange transition-colors appearance-none"
             >
               {states.map(state => (
-                <option key={state} value={state}>{state === 'All' ? 'All States' : state}</option>
+                <option key={state} value={state}>{state === 'All' ? t('gallery.allStates') : state}</option>
               ))}
             </select>
           </div>
@@ -109,7 +111,7 @@ const Gallery = () => {
 
       {/* Grid Results count */}
       <div className="mb-6 text-xs text-gray-500 font-bold tracking-widest uppercase">
-        Showing {filteredData.length} Documented Incident{filteredData.length !== 1 ? 's' : ''}
+        {t('gallery.showing')} {filteredData.length} {t('gallery.documentedIncidents')}
       </div>
 
       {/* Image Grid */}
@@ -125,8 +127,8 @@ const Gallery = () => {
               <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search size={24} className="text-gray-600" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">No results found</h3>
-              <p className="text-gray-400">Try adjusting your search or filters.</p>
+              <h3 className="text-xl font-bold text-white mb-2">{t('common.noResults')}</h3>
+              <p className="text-gray-400">{t('biodiversity.noSpeciesFound')}</p>
             </motion.div>
           ) : (
             filteredData.map(item => (

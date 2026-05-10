@@ -8,8 +8,10 @@ import Contact from './pages/Contact';
 import StateAnalysis from './pages/StateAnalysis';
 import Resources from './pages/Resources';
 import MyReports from './pages/MyReports';
+import BiodiversityInsights from './pages/BiodiversityInsights';
 import { AuthProvider } from './contexts/AuthContext';
 import AuthModal from './components/auth/AuthModal';
+import FloatingLanguageSelector from './components/ui/FloatingLanguageSelector';
 import { useNetwork } from './hooks/useNetwork';
 import { WifiOff } from 'lucide-react';
 
@@ -25,6 +27,7 @@ const AppContent = () => {
   const isOnline = useNetwork();
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isHome = location.pathname === '/';
 
   return (
     <div className="min-h-screen flex flex-col bg-brand-dark text-white bg-grid">
@@ -37,7 +40,7 @@ const AppContent = () => {
       
       {!isAdminRoute && <Navbar />}
       
-      <main className="flex-grow">
+      <main className={`flex-grow ${!isHome && !isAdminRoute ? 'pt-20' : ''}`}>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -47,6 +50,7 @@ const AppContent = () => {
           <Route path="/resources" element={<Resources />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/my-reports" element={<MyReports />} />
+          <Route path="/biodiversity" element={<BiodiversityInsights />} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={
@@ -64,6 +68,7 @@ const AppContent = () => {
       
       {!isAdminRoute && <Footer />}
       <AuthModal />
+      <FloatingLanguageSelector />
     </div>
   );
 };

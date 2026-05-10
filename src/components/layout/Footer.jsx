@@ -1,6 +1,7 @@
-
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer className="border-t border-white/10 bg-brand-dark py-8 mt-auto relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 tracking-widest font-mono">
@@ -12,12 +13,12 @@ const Footer = () => {
           <a href="#" className="hover:text-brand-orange transition-colors">IG</a>
         </div>
         
-        <div className="text-center md:text-left mb-4 md:mb-0">
-          Follow the conservation mission on social media.
+        <div className="text-center md:text-left mb-4 md:mb-0 uppercase">
+          {t('footer.followMission')}
         </div>
         
-        <div>
-          &copy; {new Date().getFullYear()} WILDMAP. ALL RIGHTS RESERVED.
+        <div className="uppercase">
+          &copy; {new Date().getFullYear()} WILDMAP. {t('footer.allRightsReserved')}
         </div>
         
       </div>

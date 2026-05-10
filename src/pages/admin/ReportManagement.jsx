@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Check, X, AlertTriangle, ShieldCheck, Cpu, Clock, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ReportDetailsModal from '../../components/admin/ReportDetailsModal';
 
 import { db } from '../../lib/firebase';
@@ -13,6 +14,7 @@ const Card = ({ children, className = "" }) => (
 );
 
 const ReportManagement = () => {
+  const { t } = useTranslation();
   const [reports, setReports] = useState([
     { id: 'rep001', timestamp: '2026-04-21T10:00:00Z', userId: 'Rahul Sharma', species: 'Deer', location: 'Mumbai-Pune Expressway', aiScore: 82, status: 'Verified', imageUrl: 'https://images.unsplash.com/photo-1484406566174-9da000fda645?auto=format&fit=crop&q=80&w=800' },
     { id: 'rep002', timestamp: '2026-04-22T11:30:00Z', userId: 'Sneha Patil', species: 'Dog', location: 'NH48', aiScore: 65, status: 'Pending', imageUrl: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&q=80&w=800' },
@@ -65,8 +67,8 @@ const ReportManagement = () => {
     <div className="space-y-6 relative h-[calc(100vh-6rem)] flex flex-col">
       <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-3xl font-hero font-bold text-white uppercase tracking-wider mb-1">Report Management</h2>
-          <p className="text-xs text-gray-400 tracking-widest uppercase">AI-Assisted Verification Queue</p>
+          <h2 className="text-3xl font-hero font-bold text-white uppercase tracking-wider mb-1">{t('admin.reports')}</h2>
+          <p className="text-xs text-gray-400 tracking-widest uppercase">{t('admin.verificationQueue')}</p>
         </div>
       </div>
 
@@ -76,12 +78,12 @@ const ReportManagement = () => {
           <div className="min-w-[900px] lg:min-w-full">
             {/* Table Header */}
             <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-white/5 border-b border-white/10 text-[10px] font-bold uppercase tracking-widest text-gray-500">
-              <div className="col-span-1">ID</div>
-              <div className="col-span-2">Timestamp</div>
-              <div className="col-span-2">User</div>
-              <div className="col-span-2">Species</div>
-              <div className="col-span-3">AI Analysis</div>
-              <div className="col-span-2 text-right">Actions</div>
+              <div className="col-span-1">{t('admin.id')}</div>
+              <div className="col-span-2">{t('admin.timestamp')}</div>
+              <div className="col-span-2">{t('admin.user')}</div>
+              <div className="col-span-2">{t('admin.species')}</div>
+              <div className="col-span-3">{t('admin.aiAnalysis')}</div>
+              <div className="col-span-2 text-right">{t('admin.actions')}</div>
             </div>
 
             {/* Table Body */}
@@ -90,11 +92,11 @@ const ReportManagement = () => {
                 {isLoading ? (
                   <div className="p-20 text-center">
                     <Loader2 size={32} className="animate-spin text-brand-orange mx-auto mb-4" />
-                    <p className="text-gray-500 uppercase tracking-widest text-[10px]">Syncing with Cloud Intelligence...</p>
+                    <p className="text-gray-500 uppercase tracking-widest text-[10px]">{t('admin.syncing')}</p>
                   </div>
                 ) : reports.length === 0 ? (
                   <div className="p-20 text-center">
-                    <p className="text-gray-500 uppercase tracking-widest text-[10px]">No Incidents Reported</p>
+                    <p className="text-gray-500 uppercase tracking-widest text-[10px]">{t('admin.noIncidents')}</p>
                   </div>
                 ) : (
                   reports.map((report) => (
@@ -130,7 +132,7 @@ const ReportManagement = () => {
                             report.aiScore >= 70 ? 'text-brand-lightGreen' : 
                             report.aiScore >= 40 ? 'text-yellow-400' : 'text-red-400'
                           }`}>
-                            {report.confidence || (report.aiScore >= 70 ? 'High' : report.aiScore >= 40 ? 'Medium' : 'Low')} Confidence
+                            {report.confidence || (report.aiScore >= 70 ? t('admin.highConfidence') : report.aiScore >= 40 ? t('admin.mediumConfidence') : t('admin.lowConfidence'))}
                           </span>
                           <span className="text-[10px] font-mono text-gray-400">{report.aiScore}%</span>
                         </div>
@@ -173,7 +175,7 @@ const ReportManagement = () => {
                           <div className={`px-3 py-1 rounded text-[9px] font-bold uppercase tracking-[0.2em] border ${
                             report.status === 'Verified' ? 'bg-brand-lightGreen/10 text-brand-lightGreen border-brand-lightGreen/20' : 'bg-red-500/10 text-red-400 border-red-500/20'
                           }`}>
-                            {report.status}
+                            {report.status === 'Verified' ? t('admin.verified') : t('admin.rejected')}
                           </div>
                         )}
                       </div>

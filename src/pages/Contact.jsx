@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Send, MapPin, Mail, AlertTriangle, Camera, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 
@@ -14,6 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { analyzeImage } from '../lib/aiValidation';
 
 const Contact = () => {
+  const { t } = useTranslation();
   const { user, openAuthModal } = useAuth();
   const [formType, setFormType] = useState('general'); // 'general' or 'report'
   
@@ -33,7 +35,7 @@ const Contact = () => {
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser');
+      alert(t('common.errorTitle') + ': Geolocation is not supported');
       return;
     }
     
@@ -45,7 +47,7 @@ const Contact = () => {
       },
       (error) => {
         console.error("Error getting location:", error);
-        alert('Unable to retrieve your location. Please check your browser permissions.');
+        alert(t('alerts.error') + ': Unable to retrieve your location.');
         setIsLocating(false);
       },
       { enableHighAccuracy: true, timeout: 10000 }
@@ -63,38 +65,34 @@ const Contact = () => {
   const handleSubmitReport = async (e) => {
     e.preventDefault();
     if (!location) {
-      alert("Please auto-detect the incident location before submitting.");
+      alert(t('alerts.warning') + ": Please auto-detect the incident location.");
       return;
     }
     if (!details) {
-      alert("Please provide the incident details.");
+      alert(t('alerts.warning') + ": Please provide details.");
       return;
     }
 
     setIsSubmitting(true);
     
-    // Set a maximum timeout for the entire submission process to prevent UI hang
     const submissionTimeout = setTimeout(() => {
       if (isSubmitting) {
         setIsSubmitting(false);
-        alert("Submission is taking longer than expected. The report has been saved locally and will sync when possible.");
+        alert(t('alerts.info') + ": Submission is taking longer. Saved locally.");
         setSubmitSuccess(true);
       }
-    }, 20000); // 20s global timeout
+    }, 20000);
 
     try {
       const reportId = Date.now().toString();
       
-      // 1. Run AI Validation (Gemini)
       let aiResult;
       try {
         aiResult = await analyzeImage(image?.previewUrl || null, details);
       } catch (aiErr) {
-        console.warn("AI Validation failed, using default values:", aiErr);
         aiResult = { aiScore: 50, confidence: 'Medium', explanation: 'AI validation skipped' };
       }
 
-      // 2. Prepare report data
       const reportData = {
         userId: user ? user.name : 'Anonymous',
         userEmail: user ? user.email : 'anonymous@wildmap.in',
@@ -111,16 +109,12 @@ const Contact = () => {
         isFlagged: aiResult.isFlagged || false
       };
 
-      // 3. Store locally immediately
       const savedReports = JSON.parse(localStorage.getItem('wildmap_reports') || '[]');
       savedReports.push({ id: reportId, ...reportData });
       localStorage.setItem('wildmap_reports', JSON.stringify(savedReports));
 
-      // 4. Sync to Firebase if online
       if (navigator.onLine) {
         let currentImageUrl = null;
-        
-        // Upload image if exists
         if (image?.file) {
           try {
             const fileExtension = image.file.name.split('.').pop();
@@ -133,7 +127,6 @@ const Contact = () => {
           }
         }
 
-        // Save to Firestore
         try {
           await addDoc(collection(db, 'reports'), {
             ...reportData,
@@ -143,14 +136,11 @@ const Contact = () => {
           });
         } catch (dbErr) {
           console.error("Firestore sync failed:", dbErr);
-          // Don't throw, we already have it in localStorage
         }
       }
 
       clearTimeout(submissionTimeout);
       setSubmitSuccess(true);
-      
-      // Reset form
       setSpecies('');
       setDate('');
       setLocation('');
@@ -159,7 +149,7 @@ const Contact = () => {
 
     } catch (error) {
       console.error("Critical submission error:", error);
-      alert("Submission Error: " + (error.message || "Unknown error"));
+      alert(t('alerts.error') + ": " + (error.message || "Unknown error"));
     } finally {
       clearTimeout(submissionTimeout);
       setIsSubmitting(false);
@@ -169,15 +159,14 @@ const Contact = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
       
-      {/* Background decoration */}
       <div className="absolute top-1/4 right-0 w-96 h-96 bg-brand-orange/10 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-lightGreen/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="text-center mb-12 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-4xl md:text-5xl font-hero font-bold mb-4 text-white">GET INVOLVED</h2>
+          <h2 className="text-4xl md:text-5xl font-hero font-bold mb-4 text-white uppercase">{t('reporting.title')}</h2>
           <p className="text-gray-400 max-w-2xl mx-auto text-sm">
-            Whether you want to partner with us or report a recent wildlife incident, your voice matters.
+            {t('reporting.subtitle')}
           </p>
         </motion.div>
         
@@ -190,12 +179,12 @@ const Contact = () => {
                 : 'border border-white/20 text-gray-400 hover:text-white hover:border-white/50'
             }`}
           >
-            Contact Us
+            {t('reporting.contactUs')}
           </button>
           <button
             onClick={() => {
               setFormType('report');
-              setSubmitSuccess(false); // Reset success state when switching
+              setSubmitSuccess(false);
             }}
             className={`px-6 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-300 ${
               formType === 'report' 
@@ -203,14 +192,13 @@ const Contact = () => {
                 : 'border border-brand-orange/20 text-brand-orange hover:bg-brand-orange/10'
             }`}
           >
-            Report Incident
+            {t('reporting.reportIncident')}
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 relative z-10">
         
-        {/* Left Column: Info */}
         <div className="lg:col-span-5 space-y-6">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
             <Card className="bg-brand-dark/80 backdrop-blur-xl border-white/10">
@@ -219,7 +207,7 @@ const Contact = () => {
                   <Mail className="text-brand-lightGreen" size={20} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white mb-1 tracking-widest uppercase text-sm">Email Us</h4>
+                  <h4 className="font-bold text-white mb-1 tracking-widest uppercase text-sm">{t('reporting.emailUs')}</h4>
                   <p className="text-gray-400 text-sm">contact@wildmap.in</p>
                 </div>
               </div>
@@ -229,7 +217,7 @@ const Contact = () => {
                   <MapPin className="text-brand-orange" size={20} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white mb-1 tracking-widest uppercase text-sm">HQ Location</h4>
+                  <h4 className="font-bold text-white mb-1 tracking-widest uppercase text-sm">{t('reporting.hqLocation')}</h4>
                   <p className="text-gray-400 text-sm">Conservation Center,<br/>Bangalore, India</p>
                 </div>
               </div>
@@ -240,9 +228,9 @@ const Contact = () => {
                 <div className="flex gap-3">
                   <AlertTriangle className="text-brand-orange shrink-0" size={24} />
                   <div>
-                    <h4 className="font-bold text-white text-sm uppercase tracking-widest mb-2">Why Report?</h4>
+                    <h4 className="font-bold text-white text-sm uppercase tracking-widest mb-2">{t('reporting.whyReport')}</h4>
                     <p className="text-xs text-gray-400 leading-relaxed">
-                      Citizen reports help identify hidden hotspots. Your data directly influences where we propose wildlife crossings and speed enforcement.
+                      {t('reporting.whyReportDesc')}
                     </p>
                   </div>
                 </div>
@@ -251,7 +239,6 @@ const Contact = () => {
           </motion.div>
         </div>
 
-        {/* Right Column: Form */}
         <div className="lg:col-span-7">
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
             <Card hover={false} className="bg-brand-dark/80 backdrop-blur-xl border-white/10">
@@ -260,20 +247,20 @@ const Contact = () => {
                 <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs text-gray-400 uppercase tracking-widest">Name</label>
-                      <input type="text" className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-brand-orange transition-colors" placeholder="John Doe" />
+                      <label className="text-xs text-gray-400 uppercase tracking-widest">{t('reporting.name')}</label>
+                      <input type="text" className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-brand-orange transition-colors" placeholder={t('reporting.namePlaceholder')} />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs text-gray-400 uppercase tracking-widest">Email</label>
-                      <input type="email" className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-brand-orange transition-colors" placeholder="john@example.com" />
+                      <label className="text-xs text-gray-400 uppercase tracking-widest">{t('reporting.email')}</label>
+                      <input type="email" className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-brand-orange transition-colors" placeholder={t('reporting.emailPlaceholder')} />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-widest">Message</label>
-                    <textarea rows="5" className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-brand-orange transition-colors" placeholder="How can we help?" />
+                    <label className="text-xs text-gray-400 uppercase tracking-widest">{t('reporting.message')}</label>
+                    <textarea rows="5" className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-brand-orange transition-colors" placeholder={t('reporting.messagePlaceholder')} />
                   </div>
                   <Button type="submit" variant="primary" icon={Send} className="w-full">
-                    SEND MESSAGE
+                    {t('reporting.sendMessage')}
                   </Button>
                 </form>
               ) : !user ? (
@@ -281,12 +268,12 @@ const Contact = () => {
                   <div className="w-20 h-20 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <AlertTriangle className="text-brand-orange w-10 h-10" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white tracking-widest">AUTHENTICATION REQUIRED</h3>
+                  <h3 className="text-2xl font-bold text-white tracking-widest uppercase">{t('reporting.authRequired')}</h3>
                   <p className="text-gray-400 max-w-md mx-auto">
-                    Please sign in to report a wildlife incident. This ensures data credibility and allows you to track the status of your reports.
+                    {t('reporting.authRequiredDesc')}
                   </p>
                   <Button onClick={openAuthModal} variant="primary">
-                    SIGN IN TO REPORT
+                    {t('reporting.signInToReport')}
                   </Button>
                 </div>
               ) : submitSuccess ? (
@@ -295,30 +282,30 @@ const Contact = () => {
                     <Send className="text-brand-lightGreen w-10 h-10" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white tracking-widest mb-2">REPORT SUBMITTED</h3>
+                    <h3 className="text-2xl font-bold text-white tracking-widest mb-2 uppercase">{t('reporting.reportSubmitted')}</h3>
                     <p className="text-gray-400 max-w-md mx-auto">
-                      Thank you for contributing to wildlife conservation. Your report has been securely saved to our database.
+                      {t('reporting.reportSubmittedDesc')}
                     </p>
                   </div>
                   <Button onClick={() => setSubmitSuccess(false)} variant="outline">
-                    SUBMIT ANOTHER REPORT
+                    {t('reporting.submitAnother')}
                   </Button>
                 </div>
               ) : (
                 <form className="space-y-6" onSubmit={handleSubmitReport}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs text-brand-orange uppercase tracking-widest">Species (if known)</label>
+                      <label className="text-xs text-brand-orange uppercase tracking-widest font-bold">{t('reporting.speciesLabel')}</label>
                       <input 
                         type="text" 
                         value={species}
                         onChange={(e) => setSpecies(e.target.value)}
                         className="w-full bg-black/50 border border-brand-orange/20 rounded-lg p-3 text-white outline-none focus:border-brand-orange transition-colors" 
-                        placeholder="e.g. Leopard, Macaque" 
+                        placeholder={t('reporting.speciesPlaceholder')} 
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs text-brand-orange uppercase tracking-widest">Date of Sighting</label>
+                      <label className="text-xs text-brand-orange uppercase tracking-widest font-bold">{t('reporting.dateLabel')}</label>
                       <input 
                         type="date" 
                         value={date}
@@ -328,7 +315,7 @@ const Contact = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs text-brand-orange uppercase tracking-widest">Incident Location *</label>
+                    <label className="text-xs text-brand-orange uppercase tracking-widest font-bold">{t('reporting.locationLabel')}</label>
                     <div 
                       onClick={!location && !isLocating ? handleGetLocation : undefined}
                       className={`border rounded-lg p-5 flex flex-col items-center justify-center transition-all duration-300 ${
@@ -340,7 +327,7 @@ const Contact = () => {
                       {isLocating ? (
                         <div className="flex items-center gap-3">
                           <Loader2 size={24} className="animate-spin" />
-                          <span className="text-sm font-bold tracking-widest">ACQUIRING SATELLITE LOCK...</span>
+                          <span className="text-sm font-bold tracking-widest uppercase">{t('reporting.locating')}</span>
                         </div>
                       ) : location ? (
                         <div className="flex items-center gap-3">
@@ -348,7 +335,7 @@ const Contact = () => {
                             <MapPin size={20} className="text-brand-lightGreen" />
                           </div>
                           <div>
-                            <span className="block text-sm font-bold tracking-widest text-white">LOCATION CAPTURED</span>
+                            <span className="block text-sm font-bold tracking-widest text-white uppercase">{t('reporting.locationCaptured')}</span>
                             <span className="block text-xs font-mono text-brand-lightGreen/80 mt-1">{location}</span>
                           </div>
                         </div>
@@ -358,15 +345,15 @@ const Contact = () => {
                             <MapPin size={24} className="text-brand-orange animate-bounce" />
                           </div>
                           <div className="text-center">
-                            <span className="block text-sm font-bold tracking-widest text-white">AUTO-DETECT GPS</span>
-                            <span className="block text-xs text-gray-400 mt-1">Tap here to lock your precise coordinates</span>
+                            <span className="block text-sm font-bold tracking-widest text-white uppercase">{t('reporting.autoDetect')}</span>
+                            <span className="block text-xs text-gray-400 mt-1 uppercase">{t('reporting.autoDetectDesc')}</span>
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs text-brand-orange uppercase tracking-widest">Visual Evidence</label>
+                    <label className="text-xs text-brand-orange uppercase tracking-widest font-bold">{t('reporting.visualEvidence')}</label>
                     <div 
                       className="border border-brand-orange/20 border-dashed rounded-lg p-4 flex flex-col items-center justify-center bg-black/30 hover:bg-black/50 transition-colors cursor-pointer" 
                       onClick={() => fileInputRef.current?.click()}
@@ -382,36 +369,36 @@ const Contact = () => {
                         <div className="relative w-full sm:w-1/2 mx-auto aspect-video rounded overflow-hidden">
                           <img src={image.previewUrl} alt="Preview" className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                            <span className="text-white text-sm font-bold">Change Image</span>
+                            <span className="text-white text-sm font-bold uppercase">{t('reporting.changeImage')}</span>
                           </div>
                         </div>
                       ) : (
                         <div className="text-center py-4">
                           <Camera className="mx-auto text-brand-orange mb-2" size={24} />
-                          <p className="text-sm text-gray-400">Click to upload photo from device</p>
+                          <p className="text-sm text-gray-400 uppercase font-bold tracking-widest">{t('reporting.uploadPhoto')}</p>
                         </div>
                       )}
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs text-brand-orange uppercase tracking-widest">Incident Details *</label>
+                    <label className="text-xs text-brand-orange uppercase tracking-widest font-bold">{t('reporting.detailsLabel')}</label>
                     <textarea 
                       rows="4" 
                       value={details}
                       onChange={(e) => setDetails(e.target.value)}
                       className="w-full bg-black/50 border border-brand-orange/20 rounded-lg p-3 text-white outline-none focus:border-brand-orange transition-colors" 
-                      placeholder="Describe the severity, condition of the animal, etc." 
+                      placeholder={t('reporting.detailsPlaceholder')} 
                       required
                     />
                   </div>
                   <Button type="submit" variant="primary" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
-                        <Loader2 size={16} className="animate-spin" /> SUBMITTING...
+                        <Loader2 size={16} className="animate-spin" /> {t('reporting.submitting')}
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <AlertTriangle size={16} /> SUBMIT REPORT
+                        <AlertTriangle size={16} /> {t('reporting.submitReport')}
                       </span>
                     )}
                   </Button>

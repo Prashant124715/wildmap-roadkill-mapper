@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import { User, Users, Database, Leaf } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ProjectInfoSection = () => {
+  const { t } = useTranslation();
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -49,10 +52,10 @@ const ProjectInfoSection = () => {
           {/* Section Title */}
           <motion.div variants={itemVariants} className="text-center space-y-4">
             <div className="inline-block px-4 py-1 rounded-full border border-brand-lightGreen/30 bg-brand-lightGreen/5 mb-2">
-              <span className="text-[10px] text-brand-lightGreen uppercase tracking-[0.3em] font-bold">Submission Details</span>
+              <span className="text-[10px] text-brand-lightGreen uppercase tracking-[0.3em] font-bold">{t('projectInfo.submissionDetails')}</span>
             </div>
             <h2 className="text-4xl md:text-6xl font-hero font-black text-white tracking-tight uppercase">
-              Project <span className="text-brand-orange text-glow">Information</span>
+              {t('projectInfo.title').split(' ')[0]} <span className="text-brand-orange text-glow">{t('projectInfo.title').split(' ')[1]}</span>
             </h2>
             <div className="h-1.5 w-24 bg-gradient-to-r from-brand-orange to-brand-lightGreen mx-auto rounded-full" />
           </motion.div>
@@ -71,21 +74,21 @@ const ProjectInfoSection = () => {
                 <Database className="text-brand-orange" size={24} sm:size={28} />
               </div>
               
-              <h3 className="text-xl sm:text-2xl font-black text-white mb-4 sm:mb-6 tracking-tight uppercase">Project Details</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-white mb-4 sm:mb-6 tracking-tight uppercase">{t('projectInfo.details')}</h3>
               
               <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold mb-1">Title</p>
-                  <p className="text-white text-base sm:text-lg font-bold leading-tight">WILDMAP – Wildlife Roadkill Hotspot Mapper</p>
+                  <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold mb-1">{t('reporting.name')}</p>
+                  <p className="text-white text-base sm:text-lg font-bold leading-tight">{t('projectInfo.projectTitle')}</p>
                 </div>
                 
                 <div className="flex gap-8">
                   <div>
-                    <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold mb-1">Division</p>
+                    <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold mb-1">{t('projectInfo.division')}</p>
                     <p className="text-brand-orange font-black text-xl">D</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold mb-1">Batch</p>
+                    <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold mb-1">{t('projectInfo.batch')}</p>
                     <p className="text-brand-lightGreen font-black text-xl">A</p>
                   </div>
                 </div>
@@ -105,7 +108,7 @@ const ProjectInfoSection = () => {
                 <Users className="text-brand-lightGreen" size={24} sm:size={28} />
               </div>
               
-              <h3 className="text-xl sm:text-2xl font-black text-white mb-4 sm:mb-6 tracking-tight uppercase">Group Members</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-white mb-4 sm:mb-6 tracking-tight uppercase">{t('projectInfo.members')}</h3>
               
               <div className="space-y-2 sm:space-y-3">
                 {members.map((member, idx) => (
@@ -135,19 +138,19 @@ const ProjectInfoSection = () => {
                 <Leaf className="text-brand-orange" size={24} sm:size={28} />
               </div>
               
-              <h3 className="text-xl sm:text-2xl font-black text-white mb-4 sm:mb-6 tracking-tight uppercase">Global Goals</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-white mb-4 sm:mb-6 tracking-tight uppercase">{t('projectInfo.goals')}</h3>
               
               <div className="space-y-4 sm:space-y-6">
                 <div className="p-4 sm:p-5 rounded-[1.25rem] sm:rounded-[1.5rem] bg-gradient-to-br from-brand-orange/20 to-brand-green/40 border border-brand-orange/30 relative overflow-hidden group-hover:from-brand-orange/30 transition-all duration-500">
                   <div className="relative z-10">
-                    <p className="text-brand-orange font-black text-xl sm:text-2xl mb-1">SDG 15</p>
-                    <p className="text-white font-black text-base sm:text-lg uppercase tracking-tight">Life on Land</p>
+                    <p className="text-brand-orange font-black text-xl sm:text-2xl mb-1">{t('projectInfo.sdg15')}</p>
+                    <p className="text-white font-black text-base sm:text-lg uppercase tracking-tight">{t('projectInfo.lifeOnLand')}</p>
                   </div>
                   <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-brand-orange/10 rounded-full blur-2xl" />
                 </div>
                 
                 <p className="text-gray-400 text-xs sm:text-sm leading-relaxed font-medium">
-                  Protect, restore and promote sustainable use of terrestrial ecosystems, sustainably manage forests, and halt biodiversity loss.
+                  {t('projectInfo.sdgDesc')}
                 </p>
               </div>
             </motion.div>

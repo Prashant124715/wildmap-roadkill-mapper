@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Scale, AlertCircle, PhoneCall, ShieldAlert, Heart, Car, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import emergencyContacts from '../data/emergencyContacts.json';
 
 const Resources = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative overflow-hidden">
       
@@ -17,11 +20,11 @@ const Resources = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="inline-flex items-center space-x-2 border border-brand-orange/30 px-3 py-1 rounded-full mb-6 bg-brand-orange/5">
             <ShieldAlert size={14} className="text-brand-orange" />
-            <span className="text-[10px] text-brand-orange uppercase tracking-[0.2em]">Awareness & Action</span>
+            <span className="text-[10px] text-brand-orange uppercase tracking-[0.2em]">{t('resources.badge')}</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-hero font-bold mb-4 text-white uppercase">Conservation Resources</h2>
+          <h2 className="text-4xl md:text-5xl font-hero font-bold mb-4 text-white uppercase">{t('resources.title')}</h2>
           <p className="text-gray-400 max-w-2xl mx-auto text-sm leading-relaxed">
-            Understand your legal responsibilities, learn how to prevent collisions, and know exactly what to do if you encounter a wildlife emergency on the road.
+            {t('resources.subtitle')}
           </p>
         </motion.div>
       </div>
@@ -36,33 +39,33 @@ const Resources = () => {
                 <div className="w-10 h-10 rounded-full bg-brand-orange/20 flex items-center justify-center">
                   <Scale className="text-brand-orange" size={20} />
                 </div>
-                <h3 className="text-lg font-hero font-bold text-white uppercase tracking-widest">Wildlife Laws</h3>
+                <h3 className="text-lg font-hero font-bold text-white uppercase tracking-widest">{t('resources.lawsTitle')}</h3>
               </div>
               
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-sm font-bold text-white mb-2">Wildlife Protection Act, 1972</h4>
+                  <h4 className="text-sm font-bold text-white mb-2">{t('resources.act1972')}</h4>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    India's primary law for the protection of plants and animal species. Under this act, hunting, harming, or accidentally killing scheduled animals (like Tigers, Leopards, Elephants) is a severe criminal offense.
+                    {t('resources.actDesc')}
                   </p>
                 </div>
                 
                 <div className="border-t border-white/10 pt-6">
                   <h4 className="text-sm font-bold text-red-400 mb-2 flex items-center gap-2">
-                    <AlertCircle size={16} /> Legal Penalties
+                    <AlertCircle size={16} /> {t('resources.penaltiesTitle')}
                   </h4>
                   <ul className="text-xs text-gray-400 space-y-3">
                     <li className="flex items-start gap-2">
                       <span className="text-red-500 font-bold">•</span>
-                      <span>Hitting a Schedule I animal (e.g., Tiger, Elephant) can lead to <strong>3 to 7 years in prison</strong> and a minimum fine of ₹10,000.</span>
+                      <span>{t('resources.penalty1')}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-red-500 font-bold">•</span>
-                      <span>Fleeing the scene without reporting the incident is considered poaching/hunting under the law.</span>
+                      <span>{t('resources.penalty2')}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-red-500 font-bold">•</span>
-                      <span>Confiscation of the vehicle involved in the collision is standard procedure.</span>
+                      <span>{t('resources.penalty3')}</span>
                     </li>
                   </ul>
                 </div>
@@ -79,38 +82,38 @@ const Resources = () => {
                 <div className="w-10 h-10 rounded-full bg-brand-orange/20 flex items-center justify-center">
                   <AlertCircle className="text-brand-orange" size={20} />
                 </div>
-                <h3 className="text-lg font-hero font-bold text-white uppercase tracking-widest">What To Do</h3>
+                <h3 className="text-lg font-hero font-bold text-white uppercase tracking-widest">{t('resources.actionTitle')}</h3>
               </div>
               
-              <p className="text-xs text-gray-400 mb-6 italic">If you witness or are involved in a wildlife collision, follow these steps immediately:</p>
+              <p className="text-xs text-gray-400 mb-6 italic">{t('resources.actionSubtitle')}</p>
               
               <div className="space-y-4">
                 <div className="flex gap-3">
                   <div className="w-6 h-6 rounded bg-black flex items-center justify-center text-xs font-bold text-brand-orange shrink-0">1</div>
                   <div>
-                    <h4 className="text-sm font-bold text-white mb-1">Do Not Touch</h4>
-                    <p className="text-xs text-gray-400">Never approach or touch an injured wild animal. They may lash out in panic, or carry zoonotic diseases.</p>
+                    <h4 className="text-sm font-bold text-white mb-1">{t('resources.step1Title')}</h4>
+                    <p className="text-xs text-gray-400">{t('resources.step1Desc')}</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-6 h-6 rounded bg-black flex items-center justify-center text-xs font-bold text-brand-orange shrink-0">2</div>
                   <div>
-                    <h4 className="text-sm font-bold text-white mb-1">Secure the Area</h4>
-                    <p className="text-xs text-gray-400">Turn on your hazard lights. If safe, place warning triangles to alert other drivers and prevent secondary accidents.</p>
+                    <h4 className="text-sm font-bold text-white mb-1">{t('resources.step2Title')}</h4>
+                    <p className="text-xs text-gray-400">{t('resources.step2Desc')}</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-6 h-6 rounded bg-black flex items-center justify-center text-xs font-bold text-brand-orange shrink-0">3</div>
                   <div>
-                    <h4 className="text-sm font-bold text-white mb-1">Inform Authorities</h4>
-                    <p className="text-xs text-gray-400">Call the local Forest Department or emergency services immediately with your exact GPS location.</p>
+                    <h4 className="text-sm font-bold text-white mb-1">{t('resources.step3Title')}</h4>
+                    <p className="text-xs text-gray-400">{t('resources.step3Desc')}</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-6 h-6 rounded bg-black flex items-center justify-center text-xs font-bold text-brand-orange shrink-0">4</div>
                   <div>
-                    <h4 className="text-sm font-bold text-white mb-1">Report Data</h4>
-                    <p className="text-xs text-gray-400">Once safe, log the incident on WILDMAP to help conservationists track the hotspot.</p>
+                    <h4 className="text-sm font-bold text-white mb-1">{t('resources.step4Title')}</h4>
+                    <p className="text-xs text-gray-400">{t('resources.step4Desc')}</p>
                   </div>
                 </div>
               </div>
@@ -118,7 +121,7 @@ const Resources = () => {
               <div className="mt-8 pt-6 border-t border-white/10">
                 <Link to="/contact">
                   <Button variant="primary" icon={ArrowRight} className="w-full text-xs">
-                    REPORT INCIDENT NOW
+                    {t('hero.reportIncident').toUpperCase()}
                   </Button>
                 </Link>
               </div>
@@ -136,40 +139,40 @@ const Resources = () => {
                 <div className="w-10 h-10 rounded-full bg-brand-lightGreen/20 flex items-center justify-center">
                   <PhoneCall className="text-brand-lightGreen" size={20} />
                 </div>
-                <h3 className="text-lg font-hero font-bold text-white uppercase tracking-widest">Emergency</h3>
+                <h3 className="text-lg font-hero font-bold text-white uppercase tracking-widest">{t('resources.emergencyTitle')}</h3>
               </div>
               
               <div className="space-y-4">
                 <div className="bg-black/40 p-3 rounded border border-white/5 flex items-center justify-between">
                   <div>
-                    <h4 className="text-xs font-bold text-white uppercase">National Emergency</h4>
-                    <p className="text-[10px] text-gray-500">General emergency response</p>
+                    <h4 className="text-xs font-bold text-white uppercase">{t('resources.nationalEmergency')}</h4>
+                    <p className="text-[10px] text-gray-500">{t('alerts.info')}</p>
                   </div>
                   <span className="text-lg font-mono text-brand-orange font-bold">{emergencyContacts.national_emergency}</span>
                 </div>
                 
                 <div className="bg-black/40 p-3 rounded border border-white/5 flex flex-col gap-1">
                   <div className="flex justify-between">
-                    <h4 className="text-xs font-bold text-white uppercase">Wildlife Crime Bureau</h4>
+                    <h4 className="text-xs font-bold text-white uppercase">{t('resources.wildlifeBureau')}</h4>
                     <span className="text-xs font-mono text-brand-orange font-bold">{emergencyContacts.wildlife_crime_control_bureau}</span>
                   </div>
-                  <p className="text-[10px] text-gray-500">For reporting organized wildlife crime or poaching.</p>
+                  <p className="text-[10px] text-gray-500">{t('mission.drivePolicy.desc')}</p>
                 </div>
                 
                 <div className="bg-black/40 p-3 rounded border border-white/5 flex flex-col gap-1">
                   <div className="flex justify-between">
-                    <h4 className="text-xs font-bold text-white uppercase">Animal Welfare Board</h4>
+                    <h4 className="text-xs font-bold text-white uppercase">{t('resources.animalBoard')}</h4>
                     <span className="text-xs font-mono text-brand-orange font-bold">{emergencyContacts.animal_welfare_board}</span>
                   </div>
-                  <p className="text-[10px] text-gray-500">For general welfare inquiries and reporting systemic issues.</p>
+                  <p className="text-[10px] text-gray-500">{t('mission.saveLives.desc')}</p>
                 </div>
 
                 <div className="bg-black/40 p-3 rounded border border-white/5 flex flex-col gap-1">
                   <div className="flex justify-between">
-                    <h4 className="text-xs font-bold text-white uppercase">Forest Department</h4>
+                    <h4 className="text-xs font-bold text-white uppercase">{t('resources.forestDept')}</h4>
                     <span className="text-xs font-mono text-brand-orange font-bold text-right w-1/2">{emergencyContacts.local_forest_department}</span>
                   </div>
-                  <p className="text-[10px] text-gray-500">Search for your local district Forest Range Officer immediately.</p>
+                  <p className="text-[10px] text-gray-500">{t('common.search')}</p>
                 </div>
               </div>
             </Card>
@@ -180,21 +183,21 @@ const Resources = () => {
                 <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
                   <Car className="text-blue-500" size={20} />
                 </div>
-                <h3 className="text-lg font-hero font-bold text-white uppercase tracking-widest">Prevention</h3>
+                <h3 className="text-lg font-hero font-bold text-white uppercase tracking-widest">{t('resources.preventionTitle')}</h3>
               </div>
               
               <ul className="text-xs text-gray-400 space-y-3">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-500 font-bold">✓</span>
-                  <span><strong>Drive under 40 km/h</strong> when passing through recognized forest corridors or national park peripheries.</span>
+                  <span>{t('resources.preventionTip1')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-500 font-bold">✓</span>
-                  <span><strong>Avoid night driving</strong> in wildlife zones. Many fatal collisions involve nocturnal animals.</span>
+                  <span>{t('resources.preventionTip2')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-500 font-bold">✓</span>
-                  <span><strong>Do not litter.</strong> Food thrown from cars attracts animals to the highway edge.</span>
+                  <span>{t('resources.preventionTip3')}</span>
                 </li>
               </ul>
             </Card>
@@ -213,9 +216,9 @@ const Resources = () => {
       >
         <div className="max-w-3xl mx-auto px-4 flex flex-col items-center">
           <Heart size={32} className="text-brand-lightGreen mb-4" />
-          <h3 className="text-2xl font-hero font-bold text-white uppercase mb-4">Roads Divide. Let's Build Bridges.</h3>
+          <h3 className="text-2xl font-hero font-bold text-white uppercase mb-4">{t('resources.footerTitle')}</h3>
           <p className="text-sm text-gray-300 leading-relaxed">
-            Every animal lost on the road is a blow to India's fragile biodiversity. By slowing down, staying alert, and reporting incidents, you become the first line of defense in wildlife conservation. Data drives policy—your reports help build underpasses and enforce safety zones.
+            {t('resources.footerDesc')}
           </p>
         </div>
       </motion.div>

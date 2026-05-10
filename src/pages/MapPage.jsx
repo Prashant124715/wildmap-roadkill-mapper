@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon, divIcon } from 'leaflet';
 import { Filter, Layers, AlertCircle, ChevronRight, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { mockIncidents } from '../data/mockData';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -43,6 +44,7 @@ import { db } from '../lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
 const MapPage = () => {
+  const { t } = useTranslation();
   const isOnline = useNetwork();
   const [activeIncident, setActiveIncident] = useState(null);
   const [filter, setFilter] = useState('All');
@@ -98,27 +100,27 @@ const MapPage = () => {
         <div className="p-6 border-b border-white/10">
           <h2 className="text-xl font-hero font-bold tracking-widest text-white mb-4 flex items-center gap-2">
             <Filter size={20} className="text-brand-orange" />
-            FILTERS
+            {t('map.filters')}
           </h2>
           
           <div className="space-y-4">
             <div>
-              <label className="text-xs text-gray-400 uppercase tracking-widest mb-2 block">Severity</label>
+              <label className="text-xs text-gray-400 uppercase tracking-widest mb-2 block">{t('map.severity')}</label>
               <select 
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
                 className="w-full bg-brand-dark/50 border border-white/20 rounded p-2 text-sm text-white outline-none focus:border-brand-orange transition-colors"
               >
-                <option value="All">All Incidents</option>
-                <option value="Critical">Critical</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
+                <option value="All">{t('map.allIncidents')}</option>
+                <option value="Critical">{t('map.allIncidents') === 'All Incidents' ? 'Critical' : 'गंभीर (Critical)'}</option>
+                <option value="High">{t('map.allIncidents') === 'All Incidents' ? 'High' : 'उच्च (High)'}</option>
+                <option value="Medium">{t('map.allIncidents') === 'All Incidents' ? 'Medium' : 'मध्यम (Medium)'}</option>
+                <option value="Low">{t('map.allIncidents') === 'All Incidents' ? 'Low' : 'कमी (Low)'}</option>
               </select>
             </div>
             
             <div className="pt-4 flex items-center justify-between text-sm text-gray-300">
-              <span className="flex items-center gap-2"><Layers size={16}/> Clustering</span>
+              <span className="flex items-center gap-2"><Layers size={16}/> {t('map.clustering')}</span>
               <div className="w-10 h-5 bg-brand-orange rounded-full relative cursor-pointer">
                 <div className="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
               </div>
@@ -140,19 +142,19 @@ const MapPage = () => {
 
               <div className="space-y-4 text-sm text-gray-300">
                 <div>
-                  <strong className="block text-white mb-1">Location Details</strong>
+                  <strong className="block text-white mb-1">{t('map.locationDetails')}</strong>
                   <p className="flex items-start gap-2">
                     <MapPin size={16} className="text-brand-lightGreen shrink-0 mt-0.5" />
-                    Coordinates: {activeIncident.location.join(', ')}
+                    {t('map.coordinates')}: {activeIncident.location.join(', ')}
                   </p>
                 </div>
                 <div>
-                  <strong className="block text-white mb-1">Description</strong>
+                  <strong className="block text-white mb-1">{t('map.description')}</strong>
                   <p className="leading-relaxed">{activeIncident.description}</p>
                 </div>
                 <div className="p-4 bg-brand-dark/50 rounded-lg border border-brand-lightGreen/30">
                   <strong className="flex items-center gap-2 text-brand-lightGreen mb-2">
-                    <AlertCircle size={16} /> Suggested Action
+                    <AlertCircle size={16} /> {t('map.suggestedAction')}
                   </strong>
                   <p className="text-xs">{activeIncident.action}</p>
                 </div>
@@ -161,7 +163,7 @@ const MapPage = () => {
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 space-y-4 opacity-50">
               <MapPin size={48} className="mb-2" />
-              <p className="text-sm tracking-widest uppercase">Select a marker<br/>to view details</p>
+              <p className="text-sm tracking-widest uppercase">{t('map.selectMarker')}</p>
             </div>
           )}
         </div>
@@ -172,8 +174,8 @@ const MapPage = () => {
         {!isOnline ? (
           <div className="w-full h-full flex flex-col items-center justify-center bg-[#050a06] text-center p-6">
             <MapPin size={48} className="text-gray-600 mb-4 opacity-50" />
-            <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-widest">Map Unavailable</h3>
-            <p className="text-gray-400 text-sm">The interactive map cannot be loaded while you are offline.</p>
+            <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-widest">{t('map.unavailable')}</h3>
+            <p className="text-gray-400 text-sm">{t('map.offlineDesc')}</p>
           </div>
         ) : (
           <MapContainer 

@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { MapPin, ExternalLink, Camera } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const GalleryCard = ({ item, onClick }) => {
+  const { t } = useTranslation();
   return (
     <motion.div
       layout
@@ -20,7 +22,7 @@ const GalleryCard = ({ item, onClick }) => {
       
       {item.is_placeholder && (
         <div className="absolute top-2 left-2 bg-black/60 backdrop-blur text-[9px] text-white/70 uppercase px-2 py-1 rounded tracking-widest border border-white/10">
-          Sample Image
+          {t('common.sampleImage')}
         </div>
       )}
 
@@ -48,7 +50,7 @@ const GalleryCard = ({ item, onClick }) => {
               <span>{item.source}</span>
             </div>
             <span className="text-[10px] text-brand-orange flex items-center gap-1 font-bold uppercase tracking-wider">
-              View Details <ExternalLink size={10} />
+              {t('buttons.viewDetails')} <ExternalLink size={10} />
             </span>
           </div>
         </div>
