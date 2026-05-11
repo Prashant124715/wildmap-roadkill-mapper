@@ -30,9 +30,9 @@ const SeasonalTrends = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-brand-dark relative overflow-hidden pt-20 pb-20">
+    <div className="min-h-screen bg-brand-dark relative pt-20 pb-20">
       {/* Background Ambience */}
-      <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=1920&q=80')`, opacity: 0.15 }} />
+      <div className="absolute inset-0 z-0 bg-cover bg-center pointer-events-none" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=1920&q=80')`, opacity: 0.15 }} />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-orange/10 via-transparent to-brand-dark/90 z-[1] pointer-events-none" />
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none z-[2]" />
       

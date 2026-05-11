@@ -45,9 +45,9 @@ const Home = () => {
         </motion.div>
 
         {/* Cinematic overlays — balanced for face visibility + text readability */}
-        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-brand-dark/50 via-transparent to-brand-dark" />
-        <div className="absolute inset-0 z-[2] bg-gradient-to-r from-brand-dark/50 via-transparent to-brand-dark/40" />
-        <div className="absolute inset-0 z-[3] hero-vignette" />
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-brand-dark/50 via-transparent to-brand-dark pointer-events-none" />
+        <div className="absolute inset-0 z-[2] bg-gradient-to-r from-brand-dark/50 via-transparent to-brand-dark/40 pointer-events-none" />
+        <div className="absolute inset-0 z-[3] hero-vignette pointer-events-none" />
 
         {/* Floating firefly particles */}
         <div className="absolute inset-0 z-[4] pointer-events-none overflow-hidden">
@@ -84,7 +84,7 @@ const Home = () => {
         </div>
 
         {/* Bottom gradient for seamless blend */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent z-[5]" />
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent z-[5] pointer-events-none" />
 
         {/* Hero Content */}
         <motion.div

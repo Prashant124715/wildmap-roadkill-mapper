@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const About = () => {
   return (
-    <div className="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative bg-brand-dark overflow-hidden">
+    <div className="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative bg-brand-dark">
       {/* Realistic Cinematic Background */}
       <div className="absolute inset-0 z-0 bg-cover bg-center bg-fixed opacity-40 transition-opacity duration-1000" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1920')` }}></div>
       <div className="absolute inset-0 z-[1] bg-gradient-to-b from-brand-dark/90 via-brand-dark/60 to-brand-dark/95"></div>

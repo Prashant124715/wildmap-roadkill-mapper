@@ -117,7 +117,7 @@ const BiodiversityInsights = () => {
     <div className="flex flex-col w-full">
       {/* HERO */}
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 pointer-events-none">
           <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=1400&q=80" alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/70 via-brand-green/80 to-brand-dark" />
         </div>
@@ -195,7 +195,7 @@ const BiodiversityInsights = () => {
 
       {/* ETHICAL GUIDELINES */}
       <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark via-[#0d2818] to-brand-dark" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark via-[#0d2818] to-brand-dark pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <div className="inline-flex items-center space-x-2 border border-brand-lightGreen/30 px-4 py-1.5 rounded-full mb-4 bg-brand-lightGreen/5">

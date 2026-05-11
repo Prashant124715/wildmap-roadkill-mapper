@@ -246,7 +246,7 @@ const DriverSafety = () => {
   const buttonBg = isNightMode ? "bg-red-600 hover:shadow-[0_0_50px_rgba(220,38,38,0.5)]" : "bg-yellow-600 hover:shadow-[0_0_50px_rgba(202,138,4,0.5)]";
 
   return (
-    <div className={`min-h-screen pt-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-1000 ${isNightMode ? 'bg-brand-dark' : 'bg-[#1a2e1c]'}`}>
+    <div className={`min-h-screen pt-24 px-4 sm:px-6 lg:px-8 relative transition-colors duration-1000 ${isNightMode ? 'bg-brand-dark' : 'bg-[#1a2e1c]'}`}>
       
       {/* -------------------- BACKGROUND -------------------- */}
       <AnimatePresence>
@@ -256,7 +256,7 @@ const DriverSafety = () => {
           animate={{ opacity: 0.4, scale: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1.5 }}
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-0 pointer-events-none"
           style={{
             backgroundImage: bgImage,
             backgroundSize: 'cover',
@@ -266,8 +266,8 @@ const DriverSafety = () => {
         />
       </AnimatePresence>
       
-      <div className={`absolute inset-0 bg-gradient-to-b ${overlayClass} z-0 transition-colors duration-1000`} />
-      <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] ${isNightMode ? 'from-brand-orange/5' : 'from-yellow-400/5'} via-transparent to-transparent z-0 transition-colors duration-1000`} />
+      <div className={`absolute inset-0 bg-gradient-to-b ${overlayClass} z-0 transition-colors duration-1000 pointer-events-none`} />
+      <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] ${isNightMode ? 'from-brand-orange/5' : 'from-yellow-400/5'} via-transparent to-transparent z-0 transition-colors duration-1000 pointer-events-none`} />
 
       {/* Particles */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">

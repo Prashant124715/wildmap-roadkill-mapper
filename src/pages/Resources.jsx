@@ -10,7 +10,7 @@ const Resources = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative overflow-hidden">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
       
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-full h-96 bg-gradient-to-b from-brand-orange/5 to-transparent pointer-events-none" />

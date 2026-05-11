@@ -9,7 +9,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-brand-dark pt-16 pb-8 border-t border-white/5 overflow-hidden">
+    <footer className="relative bg-brand-dark pt-16 pb-8 border-t border-white/5">
       {/* Ambient Background Effect */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-brand-orange/5 blur-[120px] rounded-full pointer-events-none" />
       

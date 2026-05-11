@@ -32,7 +32,7 @@ const ProjectInfoSection = () => {
   ];
 
   return (
-    <section className="py-24 bg-brand-dark relative overflow-hidden">
+    <section className="py-24 bg-brand-dark relative">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-lightGreen/20 to-transparent" />

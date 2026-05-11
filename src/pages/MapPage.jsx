@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon, divIcon } from 'leaflet';
 import { Filter, Layers, AlertCircle, ChevronRight, MapPin, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
 import { mockIncidents } from '../data/mockData';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';

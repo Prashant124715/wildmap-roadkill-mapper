@@ -21,7 +21,7 @@ const AdminLayout = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="min-h-screen bg-brand-dark flex flex-col lg:flex-row">
+    <div className="h-screen bg-brand-dark flex flex-col lg:flex-row overflow-hidden">
       
       {/* Mobile Top Header */}
       <div className="lg:hidden h-16 glass-panel border-b border-white/10 flex items-center justify-between px-4 sticky top-0 z-50">
